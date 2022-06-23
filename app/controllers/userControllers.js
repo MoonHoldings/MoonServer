@@ -10,14 +10,16 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
   const docSnap = await getDocs(q);
 
   if (docSnap.docs.length !== 0) {
-    next(new ErrorHandler("An account is associated with this email", 409));
+    return next(
+      new ErrorHandler("An account is associated with this email", 409)
+    );
   }
 
   const docRef = await addDoc(Users, {
     ...req.body,
   });
 
-  res.json({
+  res.status(200).json({
     success: true,
     user_id: docRef.id,
   });
