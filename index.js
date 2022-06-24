@@ -1,11 +1,11 @@
 const express = require("express");
 const passport = require("passport");
 
-const userRoutes = require("./app/routes/userRoutes");
-const errorMiddleware = require("./app/middlewares/error");
-const passportInit = require("./app/config/passport");
+const userRoutes = require("./src/routes/userRoutes");
+const errorMiddleware = require("./src/middlewares/error");
+const passportInit = require("./src/config/passport");
 
-require("dotenv").config({ path: "./app/config/config.env" });
+require("dotenv").config({ path: "./src/config/config.env" });
 
 const app = express();
 
