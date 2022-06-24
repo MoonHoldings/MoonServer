@@ -3,7 +3,7 @@ const passport = require("passport");
 
 const userRoutes = require("./src/routes/userRoutes");
 const errorMiddleware = require("./src/middlewares/error");
-const passportInit = require("./src/config/passport");
+const passportInit = require("./src/config/strategies/passportDiscord");
 
 require("dotenv").config({ path: "./src/config/config.env" });
 

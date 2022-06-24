@@ -1,5 +1,5 @@
 const { query, where, getDocs } = require("firebase/firestore");
-const { Users } = require("./firebase");
+const { Users } = require("../firebase");
 
 const DiscordStrategy = require("passport-discord").Strategy;
 require("dotenv").config({ path: "./config.env" });
