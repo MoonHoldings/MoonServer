@@ -1,33 +1,39 @@
-const { query, where, getDocs } = require("firebase/firestore");
-const { Users } = require("../firebase");
-
-const DiscordStrategy = require("passport-discord").Strategy;
-require("dotenv").config({ path: "./config.env" });
-
-const scopes = ["identify"];
+const { getDocs, query, where, addDoc, getDoc } = require("firebase/firestore")
+const { Strategy } = require("passport-discord")
+const ErrorHandler = require("../../utils/errorHandler")
+const { Users } = require("../firebase")
 
 module.exports = (passport) => {
   passport.use(
-    new DiscordStrategy(
+    new Strategy(
       {
         clientID: process.env.DISCORD_CLIENT_ID,
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
         callbackURL: "http://localhost:9000/api/auth/discord/redirect",
-        scope: scopes,
+        scope: ["identify"],
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log(accessToken, refreshToken);
-        console.log(profile);
+        // console.log(accessToken, refreshToken)
+        // console.log(profile)
 
-        const q = query(Users, where("email", "==", profile.email));
-        const docSnap = await getDocs(q);
-
-        if (docSnap.docs.length !== 0) {
-          console.log("this account is signed up");
-        } else {
-          console.log("This account is not signed up");
+        try {
+          const q = query(Users, where("email", "==", profile.email))
+          const qSnapshot = await getDocs(q)
+          if (qSnapshot.docs.length !== 0) {
+            return done(null, qSnapshot.docs[0].data())
+          } else {
+            // create user
+            const newUserRef = await addDoc(Users, {
+              username: profile.username,
+              email: profile.email,
+            })
+            const newUserSnap = await getDoc(newUserRef)
+            return done(null, newUserSnap.data())
+          }
+        } catch (error) {
+          return done(error, null)
         }
       }
     )
-  );
-};
+  )
+}
