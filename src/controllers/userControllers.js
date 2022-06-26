@@ -18,26 +18,32 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
   const qSnapshot = await getDocs(q)
   if (qSnapshot.docs.length !== 0) {
     next(new ErrorHandler("An account is associated with this email", 409))
+  } else {
+    // ------- save user info for registering -------
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
+    // Add a user document
+    const docRef = await addDoc(Users, {
+      username,
+      email,
+      password: hashedPassword,
+    })
+
+    res.status(200).json({
+      success: true,
+      user_id: docRef.id,
+    })
   }
 
-  // ------- save user info for registering -------
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10)
-  // Add a user document
-  const docRef = await addDoc(Users, {
-    username,
-    email,
-    password: hashedPassword,
-  })
-
-  res.status(200).json({
-    success: true,
-    user_id: docRef.id,
-  })
+  res.status(200)
 })
 
-/*
 // Login user
+exports.loginUser = asyncErrorHandler(async (req, res, next) => {
+  console.log("Logged In")
+  res.send(200)
+})
+/*
 exports.loginUser = asyncErrorHandler(async (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {

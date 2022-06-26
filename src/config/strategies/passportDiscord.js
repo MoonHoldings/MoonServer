@@ -36,4 +36,26 @@ module.exports = (passport) => {
       }
     )
   )
+
+  passport.serializeUser((user, done) => {
+    console.log("Serializing user...")
+    console.log(user)
+    done(null, user.email)
+  })
+
+  passport.deserializeUser(async (email, done) => {
+    console.log("Deserializing User")
+    console.log(email)
+    try {
+      const q = query(Users, where("email", "==", email))
+      const qSnapshot = await getDocs(q)
+
+      if (qSnapshot.docs.length !== 0)
+        throw new ErrorHandler("User not found", 404)
+
+      done(null, qSnapshot.docs[0].data())
+    } catch (error) {
+      done(err, null)
+    }
+  })
 }
