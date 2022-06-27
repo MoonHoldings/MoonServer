@@ -20,4 +20,17 @@ router.get(
   }
 )
 
+router.get("/auth/twitter", passport.authenticate("twitter"), (req, res) => {
+  res.send(200)
+})
+router.get(
+  "/auth/twitter/callback",
+  passport.authenticate("twitter"),
+  (req, res) => {
+    res.json({
+      user: req.user,
+    })
+  }
+)
+
 module.exports = router

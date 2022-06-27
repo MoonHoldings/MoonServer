@@ -7,7 +7,6 @@ const userRoutes = require("./src/routes/userRoutes")
 const errorMiddleware = require("./src/middlewares/error")
 require("./src/config/strategies/passportLocal")
 const passportDiscord = require("./src/config/strategies/passportDiscord")
-// const passportLocal = require("./src/config/strategies/passportLocal")
 
 require("dotenv").config({ path: "./src/config/config.env" })
 
@@ -22,22 +21,7 @@ app.use(
     saveUninitialized: false,
   })
 )
-
-/*
-// Passport config
-passportLocal(passport);
-app.use(passport.initialize());
-app.use(passport.session());
-*/
 passportDiscord(passport)
-
-/*
-// Global middleware
-app.use((req, res, next) => {
-  res.locals.session = req.session;
-  res.locals.user = req.user;
-});
-*/
 
 // all the routes
 app.use("/api", userRoutes)
