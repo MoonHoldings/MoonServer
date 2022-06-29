@@ -43,6 +43,12 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
   console.log("Logged In")
   res.send(200)
 })
+
+exports.logout = asyncErrorHandler(async (req, res, next) => {
+  // req.logout()
+  console.log(req.session)
+  res.send(200)
+})
 /*
 exports.loginUser = asyncErrorHandler(async (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
