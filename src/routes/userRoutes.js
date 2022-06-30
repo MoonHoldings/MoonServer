@@ -13,9 +13,8 @@ router.route("/login").post(passport.authenticate("local"), loginUser)
 
 router.route("/logout").delete(logout)
 
-router.get("/auth/discord", passport.authenticate("discord"), (req, res) => {
-  res.send(200)
-})
+// For discord authentication
+router.get("/auth/discord", passport.authenticate("discord"))
 router.get(
   "/auth/discord/redirect",
   passport.authenticate("discord"),
@@ -26,6 +25,7 @@ router.get(
   }
 )
 
+// For Twitter authentication
 router.get("/auth/twitter", passport.authenticate("twitter"))
 router.get(
   "/auth/twitter/callback",

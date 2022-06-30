@@ -21,7 +21,8 @@ module.exports = (passport) => {
           } else {
             // create user
             const newUserRef = await addDoc(Users, {
-              username: profile.username,
+              strategy: "discord",
+              username: profile.username + "649",
               email: profile.email,
             })
             const newUserSnap = await getDoc(newUserRef)

@@ -12,16 +12,15 @@ module.exports = (passport) => {
         includeEmail: true,
       },
       async function (token, tokenSecret, profile, cb) {
-        console.log(profile.emails[0].value)
-
         const q = query(Users, where("id", "==", profile.id))
         const snap = await getDocs(q)
         if (snap.docs.length !== 0) {
-          console.log(snap.docs[0].data())
           cb(null, snap.docs[0].data())
         } else {
           const newUserRef = await addDoc(Users, {
-            id: profile.id,
+            strategy: "twitter",
+            username: profile.username,
+            email: profile.emails[0].value,
           })
           const newUserSnap = await getDoc(newUserRef)
           return cb(null, newUserSnap.data())
