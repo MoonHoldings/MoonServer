@@ -5,14 +5,13 @@ const {
   loginUser,
   logout,
 } = require("../controllers/userControllers")
-const checkAuth = require("../middlewares/checkAuth")
 const router = express.Router()
 
 router.route("/register").post(registerUser)
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
 
-router.route("/logout").get(checkAuth, logout)
+router.route("/logout").delete(logout)
 
 router.get("/auth/discord", passport.authenticate("discord"), (req, res) => {
   res.send(200)
@@ -26,10 +25,6 @@ router.get(
     })
   }
 )
-
-router.get("/sample", (req, res) => {
-  res.send(200)
-})
 
 router.get("/auth/twitter", passport.authenticate("twitter"))
 router.get(

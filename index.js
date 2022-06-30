@@ -1,35 +1,33 @@
+require("dotenv").config({ path: "./src/config/config.env" })
+
 const express = require("express")
 const passport = require("passport")
-const cookieParser = require("cookie-parser")
+// const cookieParser = require("cookie-parser")
 const session = require("express-session")
 
 const userRoutes = require("./src/routes/userRoutes")
 const errorMiddleware = require("./src/middlewares/error")
-require("./src/config/strategies/passportLocal")
+const passportLocal = require("./src/config/strategies/passportLocal")
 const passportDiscord = require("./src/config/strategies/passportDiscord")
-// const passportTwitter = require("./src/config/strategies/passportTwitter")
-
-require("dotenv").config({ path: "./src/config/config.env" })
+const passportTwitter = require("./src/config/strategies/passportTwitter")
 
 const app = express()
 
-// app.use(passport.initialize())
-// app.use(passport.session())
-
 app.use(express.json())
-app.use(cookieParser())
+app.use(express.urlencoded({ extended: false }))
 app.use(
   session({
-    secret: process.env.COOKIE_SECRET,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    // cookie: {
-    //   maxAge: 1000 * 60 * 60 * 24,
-    // },
   })
 )
+app.use(passport.initialize())
+app.use(passport.session())
+
+passportLocal(passport)
 passportDiscord(passport)
-require("./src/config/strategies/passportTwitter")
+passportTwitter(passport)
 
 // all the routes
 app.use("/api", userRoutes)
