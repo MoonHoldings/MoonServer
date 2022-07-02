@@ -4,12 +4,15 @@ const {
   registerUser,
   loginUser,
   logout,
+  forgotPassword,
 } = require("../controllers/userControllers")
 const router = express.Router()
 
 router.route("/register").post(registerUser)
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
+
+router.route("/password/forgot-password").post(forgotPassword)
 
 router.route("/logout").delete(logout)
 
