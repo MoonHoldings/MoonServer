@@ -4,15 +4,22 @@ const {
   registerUser,
   loginUser,
   logout,
+  updatePassword,
   forgotPassword,
+  resetPassword,
 } = require("../controllers/userControllers")
+const checkAuth = require("../middlewares/checkAuth")
 const router = express.Router()
 
 router.route("/register").post(registerUser)
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
 
+router.route("/password/update").put(checkAuth, updatePassword)
+
 router.route("/password/forgot-password").post(forgotPassword)
+
+router.route("/password/reset/:token").put(resetPassword)
 
 router.route("/logout").delete(logout)
 

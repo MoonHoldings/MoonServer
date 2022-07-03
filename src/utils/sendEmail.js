@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer")
 
 const sendEmail = async (options) => {
   // pixa.504@gmail.com (also google cloud)
-  const transporter = nodemailer.createTransport({
+  const transporter = await nodemailer.createTransport({
     service: process.env.SMPT_SERVICE,
     auth: {
       type: process.env.SMPT_AUTH_TYPE,
@@ -22,6 +22,7 @@ const sendEmail = async (options) => {
   }
 
   await transporter.sendMail(mailOptions)
+  console.log(options)
 }
 
 module.exports = sendEmail

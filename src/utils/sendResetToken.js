@@ -12,10 +12,16 @@ module.exports = async (userId) => {
     .update(resetToken)
     .digest("hex")
   const resetPasswordExpire = Date.now() + 15 * 60 * 1000
-  await setDoc(doc(db, "users", userId), {
-    resetPasswordToken: hashedResetPassword,
-    resetPasswordExpire,
-  })
+
+  const userRef = await doc(db, "users", userId)
+  await setDoc(
+    userRef,
+    {
+      resetPasswordToken: hashedResetPassword,
+      resetPasswordExpire,
+    },
+    { merge: true }
+  )
 
   return resetToken
 }

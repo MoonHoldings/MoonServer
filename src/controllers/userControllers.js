@@ -6,6 +6,8 @@ const {
   getDoc,
   setDoc,
   doc,
+  updateDoc,
+  deleteField,
 } = require("firebase/firestore")
 const bcrypt = require("bcrypt")
 const passport = require("passport")
@@ -51,8 +53,30 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
       })
     })
   }
+})
 
-  res.status(200)
+// Update Password
+exports.updatePassword = asyncErrorHandler(async (req, res, next) => {
+  const oldPassword = req.body.oldPassword
+  const newPassword = req.body.newPassword
+
+  const isValid = await bcrypt.compare(oldPassword, req.user.password)
+
+  if (isValid) {
+    const newHashedPassword = await bcrypt.hash(newPassword, 10)
+    const q = await query(Users, where("email", "==", req.user.email))
+    const userSnap = await getDocs(q)
+    console.log(userSnap.docs[0].data())
+    await updateDoc(doc(db, "users", userSnap.docs[0].id), {
+      password: newHashedPassword,
+    })
+  } else {
+    return next(new ErrorHandler("Your present password is incorrect!"))
+  }
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  })
 })
 
 // Forgot Password
@@ -65,7 +89,7 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
   }
 
   // Get Reset Password Token
-  const resetToken = sendResetToken(docSnap.docs[0].id)
+  const resetToken = await sendResetToken(docSnap.docs[0].id)
 
   const resetPasswordUrl = `${req.protocol}://${req.get(
     "host"
@@ -85,12 +109,12 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
       message: `Email sent to ${docSnap.docs[0].data().email} successfully`,
     })
   } catch (error) {
-    await setDoc(doc(db, "users", docSnap.docs[0].id), {
-      resetPasswordToken: undefined,
-      resetPasswordExpire: undefined,
+    const errDocRef = await doc(db, "users", docSnap.docs[0].id)
+    await updateDoc(errDocRef, {
+      resetPasswordToken: deleteField(),
+      resetPasswordExpire: deleteField(),
     })
-
-    return next(new ErrorHandler(error.message, 500))
+    return next(new ErrorHandler("error from here: " + error, 500))
   }
 })
 
