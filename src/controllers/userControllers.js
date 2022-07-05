@@ -95,13 +95,14 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
     "host"
   )}/api/password/reset/${resetToken}`
 
-  const message = `Your password reset token is \n\n${resetPasswordUrl}\n\nIf you did not request this email then please ignore it`
+  const message = `Your password reset token is \n${resetPasswordUrl}\n\nIf you did not request this email then please ignore it`
 
   try {
     await sendEmail({
-      email: docSnap.docs[0].data().email,
       subject: "Password Recovery",
-      message,
+      text: message,
+      to: docSnap.docs[0].data().email,
+      from: process.env.SMPT_MAIL,
     })
 
     res.status(200).json({
@@ -121,7 +122,7 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
 // Reset Password
 exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
   // Creating token hash
-  const resetPasswordToken = crypto
+  const resetPasswordToken = await crypto
     .createHash("sha256")
     .update(req.params.token)
     .digest("hex")
@@ -145,16 +146,16 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
   const newPassword = req.body.password
   const hashedNewPassword = await bcrypt.hash(newPassword, 10)
 
-  await setDoc(doc(db, "users", docSnap.docs[0].id), {
+  const newDocRef = await doc(db, "users", docSnap.docs[0].id)
+  await updateDoc(newDocRef, {
     password: hashedNewPassword,
-    resetPasswordToken: undefined,
-    resetPasswordExpire: undefined,
   })
 
+  const newDocSnap = await getDoc(newDocRef)
   passport.authenticate("local")(req, res, () => {
     res.status(200).json({
       success: true,
-      user: docSnap.docs[0].data(),
+      user: newDocSnap.data(),
     })
   })
 })
