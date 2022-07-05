@@ -9,6 +9,7 @@ const {
   resetPassword,
 } = require("../controllers/userControllers")
 const checkAuth = require("../middlewares/checkAuth")
+const checkNotAuth = require("../middlewares/checkNotAuth")
 const router = express.Router()
 
 router.route("/register").post(registerUser)
@@ -17,9 +18,9 @@ router.route("/login").post(passport.authenticate("local"), loginUser)
 
 router.route("/password/update").put(checkAuth, updatePassword)
 
-router.route("/password/forgot-password").post(forgotPassword)
+router.route("/password/forgot-password").post(checkNotAuth, forgotPassword)
 
-router.route("/password/reset/:token").put(resetPassword)
+router.route("/password/reset/:token").put(checkNotAuth, resetPassword)
 
 router.route("/logout").delete(logout)
 

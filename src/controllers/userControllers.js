@@ -4,7 +4,6 @@ const {
   where,
   getDocs,
   getDoc,
-  setDoc,
   doc,
   updateDoc,
   deleteField,
@@ -127,14 +126,16 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
     .update(req.params.token)
     .digest("hex")
 
-  const q = query(
+  const q = await query(
     Users,
-    where("resetPasswordToken", "==", resetPasswordToken),
-    where("resetPasswordExpire", ">", Date.now())
+    where("resetPasswordToken", "==", resetPasswordToken)
   )
   const docSnap = await getDocs(q)
 
-  if (docSnap.docs.length === 0) {
+  if (
+    docSnap.docs.length === 0 ||
+    docSnap.docs[0].data().resetPasswordExpire <= Date.now()
+  ) {
     return next(
       new ErrorHandler(
         "Reset Password Token is invalid or has been expired",
@@ -149,14 +150,15 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
   const newDocRef = await doc(db, "users", docSnap.docs[0].id)
   await updateDoc(newDocRef, {
     password: hashedNewPassword,
+    resetPasswordToken: deleteField(),
+    resetPasswordExpire: deleteField(),
   })
 
   const newDocSnap = await getDoc(newDocRef)
-  passport.authenticate("local")(req, res, () => {
-    res.status(200).json({
-      success: true,
-      user: newDocSnap.data(),
-    })
+
+  res.status(200).json({
+    success: true,
+    user: newDocSnap.data(),
   })
 })
 
