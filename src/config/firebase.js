@@ -17,3 +17,4 @@ const db = getFirestore(app)
 exports.db = db
 exports.Users = collection(db, "users")
 exports.Coins = collection(db, "coins")
+exports.Usernames = collection(db, "usernames")
