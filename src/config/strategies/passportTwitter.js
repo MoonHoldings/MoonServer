@@ -1,5 +1,6 @@
 const { query, where, getDocs, addDoc, getDoc } = require("firebase/firestore")
 const { Strategy } = require("passport-twitter")
+const usernameGenerator = require("../../utils/usernameGenerator")
 const { Users } = require("../firebase")
 
 module.exports = (passport) => {
@@ -17,9 +18,12 @@ module.exports = (passport) => {
         if (snap.docs.length !== 0) {
           cb(null, snap.docs[0].data())
         } else {
+          // Generate a username
+          const username = await usernameGenerator()
+          // Create a user
           const newUserRef = await addDoc(Users, {
             strategy: "twitter",
-            username: profile.username,
+            username,
             email: profile.emails[0].value,
           })
           const newUserSnap = await getDoc(newUserRef)

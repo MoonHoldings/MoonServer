@@ -1,6 +1,7 @@
 const { getDocs, query, where, addDoc, getDoc } = require("firebase/firestore")
 const { Strategy } = require("passport-discord")
 const ErrorHandler = require("../../utils/errorHandler")
+const usernameGenerator = require("../../utils/usernameGenerator")
 const { Users } = require("../firebase")
 
 module.exports = (passport) => {
@@ -14,15 +15,20 @@ module.exports = (passport) => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          const q = query(Users, where("email", "==", profile.email))
+          const q = query(
+            Users,
+            where("strategy", "==", "discord"),
+            where("email", "==", profile.email)
+          )
           const qSnapshot = await getDocs(q)
           if (qSnapshot.docs.length !== 0) {
             return done(null, qSnapshot.docs[0].data())
           } else {
+            const username = await usernameGenerator()
             // create user
             const newUserRef = await addDoc(Users, {
               strategy: "discord",
-              username: profile.username + "649",
+              username,
               email: profile.email,
             })
             const newUserSnap = await getDoc(newUserRef)

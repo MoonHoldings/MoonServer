@@ -17,22 +17,28 @@ const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
 const sendResetToken = require("../utils/sendResetToken")
 const sendEmail = require("../utils/sendEmail")
+const usernameGenerator = require("../utils/usernameGenerator")
 
 // Register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
   // ----- Check if the email is associated to an existing account -----
-  const { username, email, password } = req.body
+  const { email, password } = req.body
 
-  if (!username || !email || !password) {
+  if (!email || !password) {
     return next(new ErrorHandler("Each field needs to be fulfilled", 409))
   }
-  const q = query(Users, where("email", "==", email))
+  const q = query(
+    Users,
+    where("strategy", "==", "local"),
+    where("email", "==", email)
+  )
   const qSnapshot = await getDocs(q)
   if (qSnapshot.docs.length !== 0) {
     return next(
       new ErrorHandler("An account is associated with this email", 409)
     )
   } else {
+    const username = await usernameGenerator()
     // ------- save user info for registering -------
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
