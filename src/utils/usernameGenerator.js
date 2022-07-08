@@ -1,5 +1,6 @@
 const { doc, getDoc, updateDoc } = require("firebase/firestore")
 const { db } = require("../config/firebase")
+const nCr = require("./nCr")
 
 function capFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
@@ -8,8 +9,11 @@ function capFirstLetter(string) {
 module.exports = async () => {
   let the_username
   let doesExist
+  let ways
+  let tryNum = 0
 
   do {
+    tryNum++
     const usernameRef = doc(db, "usernames", "username-words")
     const usernameSnap = await getDoc(usernameRef)
 
@@ -17,6 +21,9 @@ module.exports = async () => {
     const adjectives = usernameSnap.data().adjectives
     const nouns = usernameSnap.data().nouns
     const usernames = usernameSnap.data().usernames
+
+    ways =
+      nCr(adverbs.length, 1) * nCr(adjectives.length, 1) * nCr(nouns.length, 1)
 
     //Random words index
     const randAdverbsIndex = Math.floor(Math.random() * adverbs.length)
@@ -30,15 +37,31 @@ module.exports = async () => {
         Math.random() * adjectives.length
       )
 
-      the_username =
-        capFirstLetter(adjectives[randAdjectiveIndex]) +
-        capFirstLetter(adjectives[randAdjectiveIndexAgain]) +
-        capFirstLetter(nouns[randNounsIndex])
+      if (tryNum > ways) {
+        the_username =
+          capFirstLetter(adjectives[randAdjectiveIndex]) +
+          capFirstLetter(adjectives[randAdjectiveIndexAgain]) +
+          capFirstLetter(nouns[randNounsIndex]) +
+          (Math.floor(Math.random() * tryNum) + 1)
+      } else {
+        the_username =
+          capFirstLetter(adjectives[randAdjectiveIndex]) +
+          capFirstLetter(adjectives[randAdjectiveIndexAgain]) +
+          capFirstLetter(nouns[randNounsIndex])
+      }
     } else {
-      the_username =
-        capFirstLetter(adverbs[randAdverbsIndex]) +
-        capFirstLetter(adjectives[randAdjectiveIndex]) +
-        capFirstLetter(nouns[randNounsIndex])
+      if (tryNum > ways) {
+        the_username =
+          capFirstLetter(adverbs[randAdverbsIndex]) +
+          capFirstLetter(adjectives[randAdjectiveIndex]) +
+          capFirstLetter(nouns[randNounsIndex]) +
+          (Math.floor(Math.random() * tryNum) + 1)
+      } else {
+        the_username =
+          capFirstLetter(adverbs[randAdverbsIndex]) +
+          capFirstLetter(adjectives[randAdjectiveIndex]) +
+          capFirstLetter(nouns[randNounsIndex])
+      }
     }
 
     doesExist = usernames.some((username) => the_username === username)
