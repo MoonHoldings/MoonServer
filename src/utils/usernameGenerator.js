@@ -6,7 +6,7 @@ function capFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-module.exports = async () => {
+module.exports = async (email) => {
   let tryNum = 0
   let the_username
   let doesExist
@@ -102,6 +102,13 @@ module.exports = async () => {
     await updateDoc(uRef, {
       usernames,
     })
+  }
+
+  const reservedRef = doc(db, "reservedUsernames", email)
+  const reservedSnap = await getDoc(reservedRef)
+
+  if (reservedSnap.exists()) {
+    the_username = reservedSnap.data().username
   }
 
   return the_username

@@ -38,7 +38,7 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
       new ErrorHandler("An account is associated with this email", 409)
     )
   } else {
-    const username = await usernameGenerator()
+    const username = await usernameGenerator(email)
     // ------- save user info for registering -------
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
