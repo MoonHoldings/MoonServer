@@ -1,78 +1,148 @@
 const { doc, getDoc, updateDoc } = require("firebase/firestore")
 const { db } = require("../config/firebase")
-const nCr = require("./nCr")
+const uWaysNum = require("./uWaysNum")
 
 function capFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
 module.exports = async () => {
+  let tryNum = 0
   let the_username
   let doesExist
-  let ways
-  let tryNum = 0
+
+  let randAdverbIndex
+  let randAdjectiveIndex
+  let randNounIndex
+
+  const uRef = doc(db, "usernames", "username-words")
+  const uSnap = await getDoc(uRef)
+
+  const adverbs = uSnap.data().adverbs
+  const adjectives = uSnap.data().adjectives
+  const nouns = uSnap.data().nouns
+  const usernames = uSnap.data().usernames
+
+  const uWays = uWaysNum(adverbs, adjectives, nouns)
 
   do {
     tryNum++
-    const usernameRef = doc(db, "usernames", "username-words")
-    const usernameSnap = await getDoc(usernameRef)
 
-    const adverbs = usernameSnap.data().adverbs
-    const adjectives = usernameSnap.data().adjectives
-    const nouns = usernameSnap.data().nouns
-    const usernames = usernameSnap.data().usernames
+    randAdverbIndex = Math.floor(Math.random() * adverbs.length)
+    randAdjectiveIndex = Math.floor(Math.random() * adjectives.length)
+    randNounIndex = Math.floor(Math.random() * nouns.length)
 
-    ways =
-      nCr(adverbs.length, 1) * nCr(adjectives.length, 1) * nCr(nouns.length, 1)
+    const doubleWordsNumRand = Math.floor(Math.random() * 6) + 1
 
-    //Random words index
-    const randAdverbsIndex = Math.floor(Math.random() * adverbs.length)
-    const randAdjectiveIndex = Math.floor(Math.random() * adjectives.length)
-    const randNounsIndex = Math.floor(Math.random() * nouns.length)
+    if (doubleWordsNumRand === 1) {
+      let randAdjectiveIndex2
 
-    const doubleAdj = Math.floor(Math.random() * 4) + 1
+      do {
+        randAdjectiveIndex2 = Math.floor(Math.random() * adjectives.length)
+      } while (randAdjectiveIndex === randAdjectiveIndex2)
 
-    if (doubleAdj === 1) {
-      const randAdjectiveIndexAgain = Math.floor(
-        Math.random() * adjectives.length
+      the_username = makeUsername(
+        "",
+        adjectives[randAdjectiveIndex],
+        adjectives[randAdjectiveIndex2],
+        nouns[randNounIndex],
+        "",
+        tryNum,
+        uWays
       )
+    } else if (doubleWordsNumRand === 2) {
+      let randNounIndex2
 
-      if (tryNum > ways) {
-        the_username =
-          capFirstLetter(adjectives[randAdjectiveIndex]) +
-          capFirstLetter(adjectives[randAdjectiveIndexAgain]) +
-          capFirstLetter(nouns[randNounsIndex]) +
-          (Math.floor(Math.random() * tryNum) + 1)
-      } else {
-        the_username =
-          capFirstLetter(adjectives[randAdjectiveIndex]) +
-          capFirstLetter(adjectives[randAdjectiveIndexAgain]) +
-          capFirstLetter(nouns[randNounsIndex])
-      }
+      do {
+        randNounIndex2 = Math.floor(Math.random() * nouns.length)
+      } while (randNounIndex === randNounIndex2)
+
+      the_username = makeUsername(
+        adverbs[randAdverbIndex],
+        "",
+        "",
+        nouns[randNounIndex],
+        nouns[randNounIndex2],
+        tryNum,
+        uWays
+      )
+    } else if (doubleWordsNumRand === 3) {
+      let randNounIndex2
+
+      do {
+        randNounIndex2 = Math.floor(Math.random() * nouns.length)
+      } while (randNounIndex === randNounIndex2)
+
+      the_username = makeUsername(
+        "",
+        adjectives[randAdjectiveIndex],
+        "",
+        nouns[randNounIndex],
+        nouns[randNounIndex2],
+        tryNum,
+        uWays
+      )
     } else {
-      if (tryNum > ways) {
-        the_username =
-          capFirstLetter(adverbs[randAdverbsIndex]) +
-          capFirstLetter(adjectives[randAdjectiveIndex]) +
-          capFirstLetter(nouns[randNounsIndex]) +
-          (Math.floor(Math.random() * tryNum) + 1)
-      } else {
-        the_username =
-          capFirstLetter(adverbs[randAdverbsIndex]) +
-          capFirstLetter(adjectives[randAdjectiveIndex]) +
-          capFirstLetter(nouns[randNounsIndex])
-      }
+      the_username = makeUsername(
+        adverbs[randAdverbIndex],
+        adjectives[randAdjectiveIndex],
+        "",
+        nouns[randNounIndex],
+        "",
+        tryNum,
+        uWays
+      )
     }
 
     doesExist = usernames.some((username) => the_username === username)
-
-    if (!doesExist) {
-      usernames.push(the_username)
-      await updateDoc(usernameRef, {
-        usernames,
-      })
-    }
   } while (doesExist === true)
 
+  if (!doesExist) {
+    usernames.push(the_username)
+    await updateDoc(uRef, {
+      usernames,
+    })
+  }
+
   return the_username
+}
+
+function makeUsername(adv, adj, adj2, noun, noun2, tryNum, uWays) {
+  let result
+
+  if (adj2 === "" && noun2 === "") {
+    result =
+      tryNum <= uWays
+        ? capFirstLetter(adv) +
+          capFirstLetter(adj) +
+          capFirstLetter(noun) +
+          (Math.floor(Math.random() * tryNum) + 1)
+        : capFirstLetter(adv) + capFirstLetter(adj) + capFirstLetter(noun)
+  } else if (adj === "" && adj2 === "") {
+    result =
+      tryNum <= uWays
+        ? capFirstLetter(adv) +
+          capFirstLetter(noun) +
+          capFirstLetter(noun2) +
+          (Math.floor(Math.random() * tryNum) + 1)
+        : capFirstLetter(adv) + capFirstLetter(noun) + capFirstLetter(noun2)
+  } else if (adv === "" && noun2 === "") {
+    result =
+      tryNum <= uWays
+        ? capFirstLetter(adj) +
+          capFirstLetter(adj2) +
+          capFirstLetter(noun) +
+          (Math.floor(Math.random() * tryNum) + 1)
+        : capFirstLetter(adj) + capFirstLetter(adj2) + capFirstLetter(noun)
+  } else {
+    result =
+      tryNum <= uWays
+        ? capFirstLetter(adj) +
+          capFirstLetter(noun) +
+          capFirstLetter(noun2) +
+          (Math.floor(Math.random() * tryNum) + 1)
+        : capFirstLetter(adj) + capFirstLetter(noun) + capFirstLetter(noun2)
+  }
+
+  return result
 }
