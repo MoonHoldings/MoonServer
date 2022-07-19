@@ -12,21 +12,7 @@ const checkAuth = require("../middlewares/checkAuth")
 const checkNotAuth = require("../middlewares/checkNotAuth")
 const router = express.Router()
 
-router.route("/get").get((req, res) => {
-  res.json({
-    success: true,
-  })
-})
 router.route("/register").post(registerUser)
-router.route("/test-post").post((req, res) => {
-  res.json({
-    success: true,
-    data: {
-      email: req.body.email,
-      password: req.body.password,
-    },
-  })
-})
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
 
