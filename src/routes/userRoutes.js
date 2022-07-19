@@ -10,16 +10,23 @@ const {
 } = require("../controllers/userControllers")
 const checkAuth = require("../middlewares/checkAuth")
 const checkNotAuth = require("../middlewares/checkNotAuth")
-const usernameGenerator = require("../utils/usernameGenerator")
 const router = express.Router()
-router.get("/username", async (req, res) => {
-  const answer = await usernameGenerator()
+
+router.route("/get").get((req, res) => {
   res.json({
-    user: answer,
+    success: true,
   })
 })
-
 router.route("/register").post(registerUser)
+router.route("/test-post").post((req, res) => {
+  res.json({
+    success: true,
+    data: {
+      email: req.body.email,
+      password: req.body.password,
+    },
+  })
+})
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
 

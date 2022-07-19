@@ -2,8 +2,8 @@ require("dotenv").config({ path: "./src/config/config.env" })
 
 const express = require("express")
 const passport = require("passport")
-// const cookieParser = require("cookie-parser")
 const session = require("express-session")
+const cors = require("cors")
 
 const userRoutes = require("./src/routes/userRoutes")
 const errorMiddleware = require("./src/middlewares/error")
@@ -15,6 +15,7 @@ const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+app.use(cors())
 app.use(
   session({
     secret: process.env.SESSION_SECRET,

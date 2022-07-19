@@ -9,7 +9,7 @@ const {
   deleteField,
 } = require("firebase/firestore")
 const bcrypt = require("bcrypt")
-const passport = require("passport")
+// const passport = require("passport")
 const crypto = require("crypto")
 
 const { Users, db } = require("../config/firebase")
@@ -49,13 +49,10 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
       email,
       password: hashedPassword,
     })
-    const userSnap = await getDoc(docRef)
 
-    passport.authenticate("local")(req, res, () => {
-      res.status(200).json({
-        success: true,
-        user: userSnap.data(),
-      })
+    res.status(200).json({
+      success: true,
+      userId: docRef.id,
     })
   }
 })
