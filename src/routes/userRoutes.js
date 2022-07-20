@@ -10,9 +10,10 @@ const {
 } = require("../controllers/userControllers")
 const checkAuth = require("../middlewares/checkAuth")
 const checkNotAuth = require("../middlewares/checkNotAuth")
+const validatePassword = require("../middlewares/validatePassword")
 const router = express.Router()
 
-router.route("/register").post(registerUser)
+router.route("/register").post(validatePassword, registerUser)
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
 
