@@ -13,10 +13,10 @@ exports.getCoins = asyncErrorHandler(async (req, res, next) => {
 
   if (docSnap.exists()) {
     const supportedCoins = docSnap.data().coins
-    const coinsText = supportedCoins.join(",")
+    const coinIds = supportedCoins.join(",")
 
     coinsArr = await axios.get(
-      `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${coinsText}&interval=1h,1d,7d,30d&per-page=100&page=1&sort=first_priced_at`
+      `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${coinIds}&interval=1h,1d,7d,30d&per-page=100&page=1&sort=first_priced_at`
     )
   } else {
     next(new ErrorHandler("Coins not found", 404))
