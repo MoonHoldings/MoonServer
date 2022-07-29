@@ -19,7 +19,7 @@ module.exports = (passport) => {
           cb(null, snap.docs[0].data())
         } else {
           // Generate a username
-          const username = await usernameGenerator()
+          const username = await usernameGenerator(profile.emails[0].value)
           // Create a user
           const newUserRef = await addDoc(Users, {
             strategy: "twitter",
