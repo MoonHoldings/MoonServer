@@ -9,7 +9,7 @@ module.exports = (passport) => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        callbackURL: "http://localhost:9000/api/auth/twitter/callback",
+        callbackURL: "/api/auth/twitter/callback",
         includeEmail: true,
       },
       async function (token, tokenSecret, profile, cb) {

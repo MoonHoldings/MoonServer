@@ -19,6 +19,14 @@ const sendResetToken = require("../utils/sendResetToken")
 const sendEmail = require("../utils/sendEmail")
 const usernameGenerator = require("../utils/usernameGenerator")
 
+// get user details
+exports.getUser = asyncErrorHandler(async (req, res, next) => {
+  res.json({
+    success: true,
+    user: req.user,
+  })
+})
+
 // Register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
   // ----- Check if the email is associated to an existing account -----

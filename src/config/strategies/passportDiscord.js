@@ -10,7 +10,7 @@ module.exports = (passport) => {
       {
         clientID: process.env.DISCORD_CLIENT_ID,
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
-        callbackURL: "http://localhost:9000/api/auth/discord/redirect",
+        callbackURL: "/api/auth/discord/redirect",
         scope: ["identify"],
       },
       async (accessToken, refreshToken, profile, done) => {
