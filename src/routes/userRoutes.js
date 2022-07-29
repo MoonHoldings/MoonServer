@@ -14,7 +14,7 @@ const checkNotAuth = require("../middlewares/checkNotAuth")
 const validatePassword = require("../middlewares/validatePassword")
 const router = express.Router()
 
-router.route("/getuser").get(getUser)
+router.route("/getuser").get(checkAuth, getUser)
 
 router.route("/register").post(validatePassword, registerUser)
 
@@ -33,10 +33,13 @@ router.get("/auth/discord", passport.authenticate("discord"))
 router.get(
   "/auth/discord/redirect",
   passport.authenticate("discord", {
+    successRedirect: "http://localhost:3000",
     failureRedirect: "http://localhost:3000/login",
   }),
   (req, res) => {
-    res.redirect("http://localhost:3000")
+    res.json({
+      success: true,
+    })
   }
 )
 
@@ -45,10 +48,13 @@ router.get("/auth/twitter", passport.authenticate("twitter"))
 router.get(
   "/auth/twitter/callback",
   passport.authenticate("twitter", {
+    successRedirect: "http://localhost:3000",
     failureRedirect: "http://localhost:3000/login",
   }),
   (req, res) => {
-    res.redirect("http://localhost:3000")
+    res.json({
+      success: true,
+    })
   }
 )
 
