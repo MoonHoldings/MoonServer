@@ -6,13 +6,13 @@ const ErrorHandler = require("../utils/errorHandler")
 
 exports.getCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
-  let coinsArr
+  let coinsArr, coinsFormed
 
-  const docRef = await doc(db, "coins", "supported_coins")
-  const docSnap = await getDoc(docRef)
+  const coinRef = await doc(db, "coins", "supported_coins")
+  const coinSnap = await getDoc(coinRef)
 
-  if (docSnap.exists()) {
-    const supportedCoins = docSnap.data().coins
+  if (coinSnap.exists()) {
+    const supportedCoins = coinSnap.data().coins
     const coinIds = supportedCoins.join(",")
 
     coinsArr = await axios.get(
@@ -21,8 +21,20 @@ exports.getCoins = asyncErrorHandler(async (req, res, next) => {
   } else {
     next(new ErrorHandler("Coins not found", 404))
   }
+
+  coinsFormed = coinsArr.data.map(coin=>({
+    "id": coin.id,
+    "currency": coin.currency,
+    "symbol": coin.symbol,
+    "name": coin.name,
+    "logo_url": coin.logo_url,
+    "price": coin.price,
+    "circulating_supply": coin.circulating_supply,
+    "1d_change": coin["1d"]["price_change_pct"],
+    "30d_change": coin["30d"]["price_change_pct"],
+  }))
   res.json({
     success: true,
-    coins: coinsArr.data,
+    coins: coinsFormed,
   })
 })
