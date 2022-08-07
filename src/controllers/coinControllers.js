@@ -3,7 +3,6 @@ const { doc, getDoc } = require("firebase/firestore")
 const { db } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
-const test = require("../test")
 
 exports.getCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
