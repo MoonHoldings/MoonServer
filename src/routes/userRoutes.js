@@ -33,8 +33,8 @@ router.get("/auth/discord", passport.authenticate("discord"))
 router.get(
   "/auth/discord/redirect",
   passport.authenticate("discord", {
-    successRedirect: "http://localhost:3000",
-    failureRedirect: "http://localhost:3000/login",
+    successRedirect: `${process.env.FE_REDIRECT}`,
+    failureRedirect: `${process.env.FE_REDIRECT}/login`,
   }),
   (req, res) => {
     res.json({
