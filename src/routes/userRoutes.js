@@ -8,15 +8,16 @@ const {
   forgotPassword,
   resetPassword,
   getUser,
+  confirmEmail,
 } = require("../controllers/userControllers")
 const checkAuth = require("../middlewares/checkAuth")
 const checkNotAuth = require("../middlewares/checkNotAuth")
 const validatePassword = require("../middlewares/validatePassword")
 const router = express.Router()
 
-router.route("/getuser").get(checkAuth, getUser)
-
 router.route("/register").post(validatePassword, registerUser)
+
+router.route("/confirm-email").post(checkNotAuth, confirmEmail)
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
 

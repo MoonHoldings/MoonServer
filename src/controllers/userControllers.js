@@ -9,8 +9,8 @@ const {
   deleteField,
 } = require("firebase/firestore")
 const bcrypt = require("bcrypt")
-// const passport = require("passport")
 const crypto = require("crypto")
+const sgMail = require("@sendgrid/mail")
 
 const { Users, db } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
@@ -18,14 +18,6 @@ const ErrorHandler = require("../utils/errorHandler")
 const sendResetToken = require("../utils/sendResetToken")
 const sendEmail = require("../utils/sendEmail")
 const usernameGenerator = require("../utils/usernameGenerator")
-
-// get user details
-exports.getUser = asyncErrorHandler(async (req, res, next) => {
-  res.json({
-    success: true,
-    user: req.user,
-  })
-})
 
 // Register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
@@ -56,6 +48,7 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
       username,
       email,
       password: hashedPassword,
+      confirm: "",
     })
 
     res.status(200).json({
@@ -63,6 +56,62 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
       userId: docRef.id,
     })
   }
+})
+
+// Confirm Email after signup
+exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
+  sgMail.setApiKey(process.env.SENDGRID_KEY)
+  /* <h1>Hi ${req.user.username}!</h1> */
+  const mail = {
+    to: req.body.email,
+    from: {
+      email: process.env.SG_SENDER,
+      name: "MoonHoldings.xyz",
+    },
+    subject: "MoonHoldings Email Confirmation",
+    html: `
+    <h1>Hi KnowledgeSeekerAbeer!</h1>
+    <div style="font-size: 17px; font-weight: semi-bold; color: #494949;">
+      Please confirm your email address to complete sign up
+    </div>
+
+    <br/><br/>
+
+    <a style="
+        text-decoration: none;
+        padding: 15px 30px;
+        background-color: #13f195;
+        border-radius: 3px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #000;
+        "
+      href="${process.env.FE_REDIRECT}"
+      target="_blank"
+    >
+    Confirm your email
+    </a>
+
+    <br/><br/>
+
+    <div style="font-size: 17px; font-weight: semi-bold; color: #494949;">
+      Thanks!
+    </div>
+
+    <br/><br/>
+
+    <div style="font-size: 17px; font-weight: semi-bold; color: #494949;">
+      The Moon Holdings Team
+    </div>
+    `,
+  }
+
+  const response = await sgMail.send(mail)
+
+  res.json({
+    success: true,
+    response,
+  })
 })
 
 // Update Password
