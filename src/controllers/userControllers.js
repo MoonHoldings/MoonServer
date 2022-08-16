@@ -81,14 +81,14 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
   sgMail.setApiKey(process.env.SENDGRID_KEY)
   /* <h1>Hi ${req.user.username}!</h1> */
   const mail = {
-    to: req.body.email,
+    to: req.user.email,
     from: {
       email: process.env.SG_SENDER,
       name: "MoonHoldings.xyz",
     },
     subject: "MoonHoldings Email Confirmation",
     html: `
-    <h1>Hi KnowledgeSeekerAbeer!</h1>
+    <h1>Hello ${req.user.username}!</h1>
     <div style="font-size: 17px; font-weight: semi-bold; color: #494949;">
       Please confirm your email address to complete sign up
     </div>
