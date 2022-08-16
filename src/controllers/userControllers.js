@@ -7,6 +7,7 @@ const {
   doc,
   updateDoc,
   deleteField,
+  serverTimestamp,
 } = require("firebase/firestore")
 const bcrypt = require("bcrypt")
 const crypto = require("crypto")
@@ -18,6 +19,7 @@ const ErrorHandler = require("../utils/errorHandler")
 const sendResetToken = require("../utils/sendResetToken")
 const sendEmail = require("../utils/sendEmail")
 const usernameGenerator = require("../utils/usernameGenerator")
+const sendConfirmToken = require("../utils/sendConfirmToken")
 
 // Register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
@@ -49,6 +51,8 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
       email,
       password: hashedPassword,
       confirm: "",
+      confirmEmailExpire: null,
+      createdAt: serverTimestamp(),
     })
 
     res.status(200).json({
@@ -60,6 +64,20 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
 
 // Confirm Email after signup
 exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
+  const q = query(Users, where("email", "==", req.user.email))
+  const docSnap = await getDocs(q)
+
+  if (docSnap.docs.length === 0) {
+    return next(new ErrorHandler("User not found", 404))
+  }
+
+  // Get Confirm Email Token
+  const confirmToken = await sendConfirmToken(docSnap.docs[0].id)
+
+  const confirmTokenUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/confirm-email/confirm-token/${confirmToken}`
+
   sgMail.setApiKey(process.env.SENDGRID_KEY)
   /* <h1>Hi ${req.user.username}!</h1> */
   const mail = {
@@ -86,7 +104,7 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
         font-weight: bold;
         color: #000;
         "
-      href="${process.env.FE_REDIRECT}"
+      href="${confirmTokenUrl}"
       target="_blank"
     >
     Confirm your email
@@ -108,9 +126,40 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
 
   const response = await sgMail.send(mail)
 
-  res.json({
+  res.status(200).json({
     success: true,
+    message: `Email sent to ${docSnap.docs[0].data().email} successfully`,
     response,
+  })
+})
+
+exports.confirmedEmail = asyncErrorHandler(async (req, res, next) => {
+  // Creating token hash
+  const confirmEmailToken = await crypto
+    .createHash("sha256")
+    .upgrade(req.params.token)
+    .digest("hex")
+
+  const q = await query(Users, where("confirm", "==", confirmEmailToken))
+  const docSnap = await getDocs(q)
+
+  if (
+    docSnap.docs.length === 0 ||
+    docSnap.docs[0].data().confirmEmailExpire <= Date.now()
+  ) {
+    return next(
+      new ErrorHandler("Confirm Email Link is invalid or has been expired", 400)
+    )
+  }
+
+  const userRef = await doc(db, "users", docSnap.docs[0].id)
+  await updateDoc(userRef, {
+    confirm: "confirmed",
+    confirmEmailExpire: "",
+  })
+
+  res.status(200).json({
+    success: true,
   })
 })
 
