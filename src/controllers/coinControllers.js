@@ -85,4 +85,4 @@ exports.getCoins = asyncErrorHandler(async (req, res, next) => {
   // })
 })
 
-// https://api.nomics.com/v1/currencies/ticker?key=ee97b194f4a7d1f404c52aceee2a4c6b4464b970&interval=1h,1d,7d,30d&per-page=200&page=1&sort=first_priced_at
+// https://api.nomics.com/v1/currencies/ticker?key=ee97b194f4a7d1f404c52aceee2a4c6b4464b970&interval=1h,30d&per-page=100&page=1&sort=rank

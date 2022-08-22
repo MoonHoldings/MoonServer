@@ -4,10 +4,12 @@ const express = require("express")
 const passport = require("passport")
 const session = require("express-session")
 const cors = require("cors")
+const { graphqlHTTP } = require("express-graphql")
 
 const userRoutes = require("./src/routes/userRoutes")
 const coinRoutes = require("./src/routes/coinRoutes")
 
+const schema = require("./src/schema/schema")
 const errorMiddleware = require("./src/middlewares/error")
 const passportLocal = require("./src/config/strategies/passportLocal")
 const passportDiscord = require("./src/config/strategies/passportDiscord")
@@ -35,6 +37,14 @@ passportTwitter(passport)
 // all the routes
 app.use("/api", userRoutes)
 app.use("/api", coinRoutes)
+
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema,
+    graphiql: process.env.NODE_ENV === "development",
+  })
+)
 
 // Middleware for error handling
 app.use(errorMiddleware)
