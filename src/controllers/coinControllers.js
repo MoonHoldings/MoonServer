@@ -3,7 +3,7 @@ const { doc, setDoc } = require("firebase/firestore")
 const { db } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 
-exports.getCoins2DB = asyncErrorHandler(async (req, res, next) => {
+exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
   let coinsArr = []
 
