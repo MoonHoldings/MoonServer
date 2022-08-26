@@ -8,12 +8,13 @@ const {
   updateDoc,
   deleteField,
   serverTimestamp,
+  setDoc,
 } = require("firebase/firestore")
 const bcrypt = require("bcrypt")
 const crypto = require("crypto")
 const sgMail = require("@sendgrid/mail")
 
-const { Users, db } = require("../config/firebase")
+const { Users, BetaTesters, db } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
 const sendResetToken = require("../utils/sendResetToken")
@@ -287,5 +288,49 @@ exports.logout = asyncErrorHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+  })
+})
+
+// invite beta tester
+exports.inviteTester = asyncErrorHandler(async (req, res, next) => {
+  const q = await query(BetaTesters, where("email", "==", req.body.email))
+  const docSnap = await getDocs(q)
+
+  if (docSnap.docs.length !== 0) {
+    return next(new ErrorHandler("You are already invited", 409))
+  }
+
+  try {
+    const testerRef = await doc(db, "betaTesters", req.body.email)
+    await setDoc(testerRef, {
+      name: req.body.name,
+      email: req.body.email,
+      description: req.body.description,
+    })
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 409))
+  }
+
+  sgMail.setApiKey(process.env.SENDGRID_KEY)
+
+  const mail = {
+    to: req.body.email,
+    from: {
+      email: process.env.SG_SENDER,
+      name: "MoonHoldings.xyz",
+    },
+    subject: "MoonHoldings Invite",
+    html: `
+    <h2>Hello ${req.body.name}</h2>
+    <p>Thanks for signing up to get notified about the MoonHoldings Beta, we will email you again when it's time to sign up!</p>
+    `,
+  }
+
+  const response = await sgMail.send(mail)
+
+  res.status(200).json({
+    success: true,
+    message: `Email sent to ${req.body.email} successfully!`,
+    response,
   })
 })

@@ -26,14 +26,10 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
     })
   }
 
-  const coinRef = await doc(db, "coins", "top_500")
+  const coinRef = await doc(db, "coins", "all_coins")
   await setDoc(coinRef, { coins: coinsArr }, { merge: true })
 
   res.status(200).json({ success: true })
-})
-
-exports.getCoin = asyncErrorHandler(async (req, res, next) => {
-  const NOMICS_KEY = process.env.NOMICS_KEY
 })
 
 // curl "https://api.nomics.com/v1/currencies/ticker?key=ee97b194f4a7d1f404c52aceee2a4c6b4464b970&interval=1h,1d,7d,30d&per-page=1&page=1&sort=rank"
