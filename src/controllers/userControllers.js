@@ -306,6 +306,7 @@ exports.inviteTester = asyncErrorHandler(async (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       description: req.body.description,
+      subscription: req.body.subscription,
     })
   } catch (error) {
     return next(new ErrorHandler(error.message, 409))
@@ -331,6 +332,5 @@ exports.inviteTester = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: `Email sent to ${req.body.email} successfully!`,
-    response,
   })
 })
