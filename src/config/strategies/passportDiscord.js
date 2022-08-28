@@ -10,8 +10,8 @@ module.exports = (passport) => {
       {
         clientID: process.env.DISCORD_CLIENT_ID,
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
-        callbackURL: "http://localhost:9000/api/auth/discord/redirect",
-        scope: ["identify"],
+        callbackURL: "/api/auth/discord/redirect",
+        scope: ["identify", "email"],
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -24,7 +24,7 @@ module.exports = (passport) => {
           if (qSnapshot.docs.length !== 0) {
             return done(null, qSnapshot.docs[0].data())
           } else {
-            const username = await usernameGenerator()
+            const username = await usernameGenerator(profile.email)
             // create user
             const newUserRef = await addDoc(Users, {
               strategy: "discord",

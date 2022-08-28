@@ -9,22 +9,27 @@ module.exports = (passport) => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        callbackURL: "http://localhost:9000/api/auth/twitter/callback",
+        callbackURL: "/api/auth/twitter/callback",
         includeEmail: true,
       },
       async function (token, tokenSecret, profile, cb) {
-        const q = query(Users, where("id", "==", profile.id))
+        const userEmail = profile.emails[0].value
+        const q = query(
+          Users,
+          where("strategy", "==", "twitter"),
+          where("email", "==", userEmail)
+        )
         const snap = await getDocs(q)
         if (snap.docs.length !== 0) {
           cb(null, snap.docs[0].data())
         } else {
           // Generate a username
-          const username = await usernameGenerator()
+          const username = await usernameGenerator(userEmail)
           // Create a user
           const newUserRef = await addDoc(Users, {
             strategy: "twitter",
             username,
-            email: profile.emails[0].value,
+            email: userEmail,
           })
           const newUserSnap = await getDoc(newUserRef)
           return cb(null, newUserSnap.data())

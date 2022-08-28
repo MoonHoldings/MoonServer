@@ -10,7 +10,12 @@ module.exports = (req, res, next) => {
   const numbers = password.match(/[0-9]/g)
   const specialChars = password.match(/[^A-z0-9\s]/g)
 
-  if (letters !== null && numbers !== null && specialChars !== null) {
+  if (
+    password.length >= 8 &&
+    letters !== null &&
+    numbers !== null &&
+    specialChars !== null
+  ) {
     next()
   } else {
     next(
