@@ -125,12 +125,11 @@ exports.confirmEmail = asyncErrorHandler(async (req, res, next) => {
     `,
   }
 
-  const response = await sgMail.send(mail)
+  await sgMail.send(mail)
 
   res.status(200).json({
     success: true,
     message: `Email sent to ${docSnap.docs[0].data().email} successfully`,
-    response,
   })
 })
 
@@ -206,13 +205,19 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
 
   const message = `Your password reset token is \n${resetPasswordUrl}\n\nIf you did not request this email then please ignore it`
 
+  sgMail.setApiKey(process.env.SENDGRID_KEY)
+
   try {
-    await sendEmail({
-      subject: "Password Recovery",
+    const mail = {
+      to: req.user.email,
+      from: {
+        email: process.env.SG_SENDER,
+        name: "MoonHoldings.xyz",
+      },
+      subject: "Reset Password",
       text: message,
-      to: docSnap.docs[0].data().email,
-      from: process.env.SMPT_MAIL,
-    })
+    }
+    await sgMail.send(mail)
 
     res.status(200).json({
       success: true,
