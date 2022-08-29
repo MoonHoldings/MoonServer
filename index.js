@@ -13,7 +13,7 @@ const passportLocal = require("./src/config/strategies/passportLocal")
 const passportDiscord = require("./src/config/strategies/passportDiscord")
 const passportTwitter = require("./src/config/strategies/passportTwitter")
 
-const corsOptions = require("./constants/config")
+const corsOptions = require("./src/constants/config")
 
 const app = express()
 
