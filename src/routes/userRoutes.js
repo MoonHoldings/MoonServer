@@ -1,6 +1,6 @@
 const express = require("express")
 const passport = require("passport")
-const cors = require("cors")
+// const cors = require("cors")
 const {
   registerUser,
   loginUser,
@@ -17,7 +17,7 @@ const checkNotAuth = require("../middlewares/checkNotAuth")
 const validatePassword = require("../middlewares/validatePassword")
 const router = express.Router()
 
-const corsOptions = require("../constants/config")
+// const corsOptions = require("../constants/config")
 
 router.route("/register").post(validatePassword, registerUser)
 
@@ -35,7 +35,8 @@ router.route("/password/reset/:token").put(checkNotAuth, resetPassword)
 
 router.route("/logout").delete(logout)
 
-router.route("/invite").post(cors(corsOptions), inviteTester)
+router.route("/invite").post(inviteTester)
+// router.route("/invite").post(cors(corsOptions), inviteTester)
 
 // For discord authentication
 router.get("/auth/discord", passport.authenticate("discord"))
