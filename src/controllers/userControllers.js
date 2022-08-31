@@ -13,7 +13,7 @@ const {
 const bcrypt = require("bcrypt")
 const crypto = require("crypto")
 const sgMail = require("@sendgrid/mail")
-const cors = require("cors")
+// const cors = require("cors")
 
 const { Users, BetaTesters, db } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
@@ -23,7 +23,7 @@ const sendEmail = require("../utils/sendEmail")
 const usernameGenerator = require("../utils/usernameGenerator")
 const sendConfirmToken = require("../utils/sendConfirmToken")
 
-const corsOptions = require("../constants/config")
+// const corsOptions = require("../constants/config")
 
 // Register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {

@@ -1,10 +1,10 @@
 const axios = require("axios")
-const cors = require("cors")
+// const cors = require("cors")
 const { doc, setDoc } = require("firebase/firestore")
 const { db } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 
-const corsOptions = require("../constants/config")
+// const corsOptions = require("../constants/config")
 
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
@@ -14,7 +14,8 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
     const response = await axios.get(
       `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&interval=1d,30d&per-page=100&page=${
         i + 1
-      }&sort=rank`, cors(corsOptions)
+      }&sort=rank`
+      // }&sort=rank`, cors(corsOptions)
     )
 
     response.data.forEach((coin) => {
