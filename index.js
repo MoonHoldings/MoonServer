@@ -44,6 +44,16 @@ passportTwitter(passport)
 app.use("/api", userRoutes)
 app.use("/api", coinRoutes)
 
+app.get('/hello', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
+  res.end(
+    `Hello this is <strong>MoonServer</strong>! 
+    <br/> Please visit the frontend here: 
+    <h1><a href="https://moonholdings.xyz">MoonHoldings.xyz</a></h1>`
+  );
+});
+
 // Middleware for error handling
 app.use(errorMiddleware)
 
