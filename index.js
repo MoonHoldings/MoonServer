@@ -13,13 +13,19 @@ const passportLocal = require("./src/config/strategies/passportLocal")
 const passportDiscord = require("./src/config/strategies/passportDiscord")
 const passportTwitter = require("./src/config/strategies/passportTwitter")
 
-const corsOptions = require("./constants/config")
+// const corsOptions = require("./src/constants/config")
 
 const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use(cors(corsOptions))
+app.use(
+  cors({
+    origin: "https://moonholdings.xyz",
+  })
+)
+// app.use(cors())
+// app.use(cors(corsOptions))
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -37,6 +43,16 @@ passportTwitter(passport)
 // all the routes
 app.use("/api", userRoutes)
 app.use("/api", coinRoutes)
+
+app.get('/hello', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
+  res.end(
+    `Hello this is <strong>MoonServer</strong>! 
+    <br/> Please visit the frontend here: 
+    <h1><a href="https://moonholdings.xyz">MoonHoldings.xyz</a></h1>`
+  );
+});
 
 // Middleware for error handling
 app.use(errorMiddleware)
