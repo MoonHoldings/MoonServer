@@ -9,10 +9,12 @@
     "Ajoy Thomas"
   ],
   "license": "(MIT OR Apache-2.0)",
+  "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"
   },
+  "keywords": [],
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
     "axios": "^0.27.2",
