@@ -1,5 +1,5 @@
 {
-  "name": "moonholdings",
+  "name": "moonserver",
   "version": "1.0.0",
   "description": "MoonHoldings Server",
   "author": "Leon <leon@moonholdings.xyz> (https://twitter.com/leongaban)",
@@ -8,7 +8,7 @@
     "Abeer Mithela",
     "Ajoy Thomas"
   ],
-  "license": "(MIT OR Apache-2.0)",
+  "license": "(MIT)",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",

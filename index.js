@@ -13,19 +13,15 @@ const passportLocal = require("./src/config/strategies/passportLocal")
 const passportDiscord = require("./src/config/strategies/passportDiscord")
 const passportTwitter = require("./src/config/strategies/passportTwitter")
 
-// const corsOptions = require("./src/constants/config")
-
 const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use(
-  cors({
-    origin: "https://moonholdings.xyz",
-  })
-)
-// app.use(cors())
-// app.use(cors(corsOptions))
+app.use(cors(
+  {
+    origin: '*'
+  }
+))
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
