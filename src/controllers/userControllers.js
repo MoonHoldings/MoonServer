@@ -14,7 +14,13 @@ const bcrypt = require("bcrypt")
 const crypto = require("crypto")
 const sgMail = require("@sendgrid/mail")
 
-const { Users, BetaTesters, db } = require("../config/firebase")
+const {
+  Users,
+  BetaTesters,
+  InvestorNetwork,
+  TestNetwork,
+  db,
+} = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
 const sendResetToken = require("../utils/sendResetToken")
@@ -337,5 +343,31 @@ exports.inviteTester = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: `Email sent to ${req.body.email} successfully!`,
+  })
+})
+
+exports.sendNewsletter = asyncErrorHandler(async (req, res, next) => {
+  const investorEmails = []
+  const snapshot = await getDocs(TestNetwork)
+  snapshot.docs.forEach((doc) => {
+    investorEmails.push(doc.data().email)
+  })
+
+  sgMail.setApiKey(process.env.SENDGRID_KEY)
+  const mail = {
+    to: investorEmails,
+    from: {
+      email: process.env.SG_SENDER,
+      name: "MoonHoldings.xyz",
+    },
+    subject: `${req.body.subject}`,
+    html: `${req.body.html}`,
+  }
+
+  await sgMail.send(mail)
+
+  res.status(200).json({
+    success: true,
+    message: `Email sent to ${snapshot.docs.length} email addresses.`,
   })
 })

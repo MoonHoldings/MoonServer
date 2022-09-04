@@ -11,6 +11,7 @@ const {
   confirmEmail,
   confirmedEmail,
   inviteTester,
+  sendNewsletter,
 } = require("../controllers/userControllers")
 const checkAuth = require("../middlewares/checkAuth")
 const checkNotAuth = require("../middlewares/checkNotAuth")
@@ -36,7 +37,8 @@ router.route("/password/reset/:token").put(checkNotAuth, resetPassword)
 router.route("/logout").delete(logout)
 
 router.route("/invite").post(inviteTester)
-// router.route("/invite").post(cors(corsOptions), inviteTester)
+
+router.route("/send-newsletter").post(sendNewsletter)
 
 // For discord authentication
 router.get("/auth/discord", passport.authenticate("discord"))
