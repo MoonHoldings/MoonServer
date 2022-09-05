@@ -364,7 +364,7 @@ exports.sendNewsletter = asyncErrorHandler(async (req, res, next) => {
     html: `${req.body.html}`,
   }
 
-  await sgMail.send(mail)
+  await sgMail.sendMultiple(mail)
 
   res.status(200).json({
     success: true,
