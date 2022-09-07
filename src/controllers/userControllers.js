@@ -331,10 +331,11 @@ exports.inviteTester = asyncErrorHandler(async (req, res, next) => {
       email: process.env.SG_SENDER,
       name: "MoonHoldings.xyz",
     },
-    subject: "MoonHoldings Invite",
+    subject: "MoonHoldings Beta Invite",
     html: `
     <h2>Hello ${req.body.name}</h2>
-    <p>Thanks for signing up to get notified about the MoonHoldings Beta, we will email you again when it's time to sign up!</p>
+    <p>Thanks for signing up to get notified about the MoonHoldings Beta, we will email you again when it's time to sign up!</p><br/>
+    <p>You can reply to this email, I will read it and respond if needed :) - Leon</p><br/>
     `,
   }
 
