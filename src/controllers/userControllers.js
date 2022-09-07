@@ -348,7 +348,7 @@ exports.inviteTester = asyncErrorHandler(async (req, res, next) => {
 
 exports.sendNewsletter = asyncErrorHandler(async (req, res, next) => {
   const investorEmails = []
-  const snapshot = await getDocs(TestNetwork)
+  const snapshot = await getDocs(InvestorNetwork)
   snapshot.docs.forEach((doc) => {
     investorEmails.push(doc.data().email)
   })
