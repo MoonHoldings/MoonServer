@@ -2,13 +2,13 @@ const { initializeApp } = require("firebase/app")
 const { getFirestore, collection } = require("firebase/firestore")
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCIx2G6E_-Xkg-6qmpgFwRtc6cTH9WJhK8",
-  authDomain: "moonholdings-d3dd9.firebaseapp.com",
-  projectId: "moonholdings-d3dd9",
-  storageBucket: "moonholdings-d3dd9.appspot.com",
-  messagingSenderId: "801831571722",
-  appId: "1:801831571722:web:6bedd3db6a1877d504eaf3",
-  measurementId: "G-ZT04M90N1E",
+  apiKey: process.env.FB_API_KEY,
+  authDomain: process.env.FB_AUTH_DOMAIN,
+  projectId: process.env.FB_PROJECT_ID,
+  storageBucket: process.env.FB_STORAGE_BUCKET,
+  messagingSenderId: process.env.FB_MESSAGING_SENDER_ID,
+  appId: process.env.FB_APP_ID,
+  measurementId: process.env.FB_MEASUREMENT_ID,
 }
 
 const app = initializeApp(firebaseConfig)
