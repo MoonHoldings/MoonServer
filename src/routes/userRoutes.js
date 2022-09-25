@@ -11,6 +11,7 @@ const {
   confirmEmail,
   confirmedEmail,
   inviteTester,
+  countBeta,
   sendNewsletter,
 } = require("../controllers/userControllers")
 const checkAuth = require("../middlewares/checkAuth")
@@ -37,6 +38,8 @@ router.route("/password/reset/:token").put(checkNotAuth, resetPassword)
 router.route("/logout").delete(logout)
 
 router.route("/invite").post(inviteTester)
+
+router.route("/count-beta-testers").get(countBeta)
 
 router.route("/send-newsletter").post(sendNewsletter)
 

@@ -346,6 +346,15 @@ exports.inviteTester = asyncErrorHandler(async (req, res, next) => {
   })
 })
 
+exports.countBeta = asyncErrorHandler(async (req, res, next) => {
+  const docSnap = await getDocs(BetaTesters)
+
+  res.json({
+    success: true,
+    betaTesters: docSnap.docs.length,
+  })
+})
+
 exports.sendNewsletter = asyncErrorHandler(async (req, res, next) => {
   const investorEmails = []
   const snapshot = await getDocs(TestNetwork)
