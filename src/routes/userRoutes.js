@@ -12,6 +12,7 @@ const {
   confirmedEmail,
   inviteTester,
   countBeta,
+  countNetwork,
   sendNewsletter,
 } = require("../controllers/userControllers")
 const checkAuth = require("../middlewares/checkAuth")
@@ -40,6 +41,7 @@ router.route("/logout").delete(logout)
 router.route("/invite").post(inviteTester)
 
 router.route("/count-beta-testers").get(countBeta)
+router.route("/count-network").get(countNetwork)
 
 router.route("/send-newsletter").post(sendNewsletter)
 
