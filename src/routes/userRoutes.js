@@ -1,6 +1,5 @@
 const express = require("express")
 const passport = require("passport")
-// const cors = require("cors")
 const {
   registerUser,
   loginUser,
@@ -8,7 +7,6 @@ const {
   updatePassword,
   forgotPassword,
   resetPassword,
-  confirmEmail,
   confirmedEmail,
   inviteTester,
   countBeta,
@@ -20,13 +18,11 @@ const checkNotAuth = require("../middlewares/checkNotAuth")
 const validatePassword = require("../middlewares/validatePassword")
 const router = express.Router()
 
-// const corsOptions = require("../constants/config")
-
 router.route("/register").post(validatePassword, registerUser)
 
-router.route("/confirm-email").post(checkAuth, confirmEmail)
+// router.route("/confirm-email").post(checkAuth, confirmEmail)
 
-router.route("/confirm-email/confirm-token/:token").put(confirmedEmail)
+router.route("/confirm-email/confirm-token/:token").get(confirmedEmail)
 
 router.route("/login").post(passport.authenticate("local"), loginUser)
 

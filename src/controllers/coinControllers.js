@@ -1,6 +1,13 @@
 const axios = require("axios")
-const { doc, setDoc } = require("firebase/firestore")
-const { db } = require("../config/firebase")
+const {
+  doc,
+  setDoc,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} = require("firebase/firestore")
+const { db, Users } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
@@ -30,4 +37,23 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   await setDoc(coinRef, { coins: coinsArr }, { merge: true })
 
   res.status(200).json({ success: true })
+})
+
+exports.saveCoin = asyncErrorHandler(async (req, res, next) => {
+  const coin = req.body.coin
+
+  const q = query(Users, where("email", "==", req.user.email))
+  const qSnapshot = await getDocs(q)
+
+  const theUser = qSnapshot.docs[0].data()
+  theUser.portfolio.coins.push(coin)
+
+  const docRef = await doc(db, "users", userSnap.docs[0].id)
+  await updateDoc(docRef, {
+    portfolio: theUser.portfolio,
+  })
+
+  res.status(200).json({
+    success: true
+  })
 })
