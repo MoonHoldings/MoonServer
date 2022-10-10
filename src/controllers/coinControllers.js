@@ -39,21 +39,39 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({ success: true })
 })
 
+exports.getCoins = asyncErrorHandler(async (req, res, next) => {
+  const q = query(Users, where("email", "==", req.user.email))
+  const qSnapshot = await getDocs(q)
+
+  if (qSnapshot.docs.length === 0) {
+    return next("No account found", 401)
+  }
+
+  res.status(200).json({
+    success: true,
+    coins: qSnapshot.docs[0].data().portfolio.coins,
+  })
+})
+
 exports.saveCoin = asyncErrorHandler(async (req, res, next) => {
   const coin = req.body.coin
 
-  const q = query(Users, where("email", "==", req.user.email))
+  const q = query(Users, where("email", "==", req.body.email))
   const qSnapshot = await getDocs(q)
+
+  if (qSnapshot.docs.length === 0) {
+    return next("No account found", 401)
+  }
 
   const theUser = qSnapshot.docs[0].data()
   theUser.portfolio.coins.push(coin)
 
-  const docRef = await doc(db, "users", userSnap.docs[0].id)
+  const docRef = await doc(db, "users", qSnapshot.docs[0].id)
   await updateDoc(docRef, {
     portfolio: theUser.portfolio,
   })
 
   res.status(200).json({
-    success: true
+    success: true,
   })
 })
