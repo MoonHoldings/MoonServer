@@ -4,6 +4,7 @@ const {
   getCoins,
   saveCoin,
   updateCoin,
+  removeCoin,
 } = require("../controllers/coinControllers")
 const checkAuth = require("../middlewares/checkAuth")
 const { route } = require("./userRoutes")
@@ -16,5 +17,7 @@ router.route("/portfolio-coins").get(checkAuth, getCoins)
 router.route("/save-coin").put(saveCoin)
 
 router.route("/update-coin").put(updateCoin)
+
+router.route("/remove-coin").delete(removeCoin)
 
 module.exports = router
