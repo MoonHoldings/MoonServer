@@ -18,6 +18,6 @@ router.route("/save-coin").put(saveCoin)
 
 router.route("/update-coin").put(updateCoin)
 
-router.route("/remove-coin").delete(removeCoin)
+router.route("/remove-coin").put(removeCoin)
 
 module.exports = router
