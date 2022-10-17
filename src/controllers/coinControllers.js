@@ -36,13 +36,12 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
 
   // extra supported coins array
   const extra_coins = []
-  const extraRef = await doc(db, "coins", "extra_coins")
+  const extraRef = await doc(db, "coins", "more_coins")
   const extraSnap = await getDoc(extraRef)
 
   if (extraSnap.exists()) {
     extraSnap.data().coins.forEach((coin) => {
       const doesExist = coinsArr.some((c) => c.id === coin)
-
       if (!doesExist) {
         extra_coins.push(coin)
       }
@@ -52,7 +51,7 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   ////////////////// getting coins from nomics
   const allIds = extra_coins.join(",")
   const response = await axios.get(
-    `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${allIds}&interval=1d,30d&per-page=100&page=1`
+    `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${allIds}&per-page=100&page=1`
   )
 
   response.data.forEach((coin) => {
@@ -70,7 +69,11 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const coinRef = await doc(db, "coins", "all_coins")
   await setDoc(coinRef, { coins: coinsArr }, { merge: true })
 
-  res.status(200).json({ success: true, coinNum: coinsArr.length })
+  res.status(200).json({
+    success: true,
+    coinNum: coinsArr.length,
+    extra: extraSnap.data().coins.length,
+  })
 })
 
 exports.getCoins = asyncErrorHandler(async (req, res, next) => {
