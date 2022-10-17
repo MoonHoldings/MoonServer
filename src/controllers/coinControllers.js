@@ -70,7 +70,7 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const coinRef = await doc(db, "coins", "all_coins")
   await setDoc(coinRef, { coins: coinsArr }, { merge: true })
 
-  res.status(200).json({ success: true })
+  res.status(200).json({ success: true, coinNum: coinsArr.length })
 })
 
 exports.getCoins = asyncErrorHandler(async (req, res, next) => {
