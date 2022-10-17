@@ -10,7 +10,7 @@ const checkAuth = require("../middlewares/checkAuth")
 const { route } = require("./userRoutes")
 const router = express.Router()
 
-router.route("/save-coins").get(saveAllCoins)
+router.route("/save-coins").get(saveAllCoins) //cron job
 
 router.route("/portfolio-coins").get(checkAuth, getCoins)
 
