@@ -15,7 +15,7 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
   let coinsArr = []
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     const response = await axios.get(
       `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&interval=1d,30d&per-page=100&page=${
         i + 1
@@ -56,7 +56,14 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   )
 
   response.data.forEach((coin) => {
-    coinsArr.push(coin)
+    const coinObj = {
+      id: coin.id,
+      symbol: coin.symbol,
+      name: coin.name,
+      logo_url: coin.logo_url,
+    }
+
+    coinsArr.push(coinObj)
   })
   //////////////////
 
