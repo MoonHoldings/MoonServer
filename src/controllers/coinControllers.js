@@ -10,6 +10,7 @@ const {
 } = require("firebase/firestore")
 const { db, Users } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
+const refreshCoinPrices = require("../utils/refreshCoinPrices")
 
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
@@ -87,6 +88,15 @@ exports.getCoins = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     coins: qSnapshot.docs[0].data().portfolio.coins,
+  })
+})
+
+exports.refreshCoins = asyncErrorHandler(async (req, res, next) => {
+  const updatedCoins = await refreshCoinPrices(req.body.email)
+
+  res.status(200).json({
+    success: true,
+    coins: updatedCoins,
   })
 })
 
