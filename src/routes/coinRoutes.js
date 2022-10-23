@@ -5,6 +5,7 @@ const {
   saveCoin,
   updateCoin,
   removeCoin,
+  refreshCoins,
 } = require("../controllers/coinControllers")
 const authenticateToken = require("../middlewares/authenticateToken")
 const checkAuth = require("../middlewares/checkAuth")
@@ -20,5 +21,7 @@ router.route("/save-coin").put(authenticateToken, saveCoin)
 router.route("/update-coin").put(authenticateToken, updateCoin)
 
 router.route("/remove-coin").put(authenticateToken, removeCoin)
+
+router.route("/refresh-coins").post(refreshCoins)
 
 module.exports = router
