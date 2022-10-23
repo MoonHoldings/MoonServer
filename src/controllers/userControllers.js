@@ -13,6 +13,7 @@ const {
 const bcrypt = require("bcrypt")
 const crypto = require("crypto")
 const sgMail = require("@sendgrid/mail")
+const jwt = require("jsonwebtoken")
 
 const {
   Users,
@@ -244,19 +245,49 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
 
 // Login user
 exports.loginUser = asyncErrorHandler(async (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    user: {
-      username: req.user.username,
-      email: req.user.email,
-      confirm: req.user.confirm,
-      createdAt: req.user.createdAt,
-      portfolioStyle: req.user.portfolioStyle,
-      currency: req.user.currency,
-      activity: req.user.activity,
-      portfolio: req.user.portfolio,
-    },
-  })
+  const email = req.body.email
+  const password = req.body.password
+
+  if (!email || !password) {
+    return next(new ErrorHandler("Every field needs to be fulfilled", 400))
+  }
+
+  const q = query(Users, where("email", "==", email))
+  const qSnapshot = await getDocs(q)
+
+  if (qSnapshot.docs.length === 0) {
+    return next(
+      new ErrorHandler("There is no account associated to this email", 401)
+    )
+  }
+
+  const user = await qSnapshot.docs[0].data()
+  const isValid = await bcrypt.compare(password, user.password)
+
+  if (isValid) {
+    const accessToken = jwt.sign(
+      {
+        username: user.username,
+        email: user.email,
+        confirm: user.confirm,
+        createdAt: user.createdAt,
+        portfolioStyle: user.portfolioStyle,
+        currency: user.currency,
+        activity: user.activity,
+        portfolio: user.portfolio,
+      },
+      process.env.JWT_SECRET
+    )
+
+    return res.status(200).json({
+      success: true,
+      accessToken
+    })
+  } else {
+    res.status(401).json({
+      success: false,
+    })
+  }
 })
 
 exports.logout = asyncErrorHandler(async (req, res, next) => {

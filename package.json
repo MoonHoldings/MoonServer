@@ -26,6 +26,7 @@
     "express-session": "^1.17.3",
     "firebase": "^9.8.3",
     "googleapis": "^105.0.0",
+    "jsonwebtoken": "^8.5.1",
     "nodemailer": "^6.7.6",
     "nodemon": "^2.0.19",
     "passport": "^0.6.0",
