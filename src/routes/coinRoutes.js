@@ -22,6 +22,6 @@ router.route("/update-coin").put(authenticateToken, updateCoin)
 
 router.route("/remove-coin").put(authenticateToken, removeCoin)
 
-router.route("/refresh-coins").post(refreshCoins)
+router.route("/refresh-coins").post(authenticateToken, refreshCoins)
 
 module.exports = router
