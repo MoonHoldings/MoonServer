@@ -1,6 +1,5 @@
 const express = require("express")
 const passport = require("passport")
-// const cors = require("cors")
 const {
   registerUser,
   loginUser,
@@ -8,35 +7,39 @@ const {
   updatePassword,
   forgotPassword,
   resetPassword,
-  confirmEmail,
   confirmedEmail,
   inviteTester,
+  countBeta,
+  countNetwork,
   sendNewsletter,
 } = require("../controllers/userControllers")
+const authenticateToken = require("../middlewares/authenticateToken")
 const checkAuth = require("../middlewares/checkAuth")
 const checkNotAuth = require("../middlewares/checkNotAuth")
 const validatePassword = require("../middlewares/validatePassword")
 const router = express.Router()
 
-// const corsOptions = require("../constants/config")
-
 router.route("/register").post(validatePassword, registerUser)
 
-router.route("/confirm-email").post(checkAuth, confirmEmail)
+// router.route("/confirm-email").post(checkAuth, confirmEmail)
 
-router.route("/confirm-email/confirm-token/:token").put(confirmedEmail)
+router.route("/confirm-email/confirm-token/:token").get(confirmedEmail)
 
-router.route("/login").post(passport.authenticate("local"), loginUser)
+router.route("/login").post(loginUser)
+// router.route("/login").post(passport.authenticate("local"), loginUser)
 
-router.route("/password/update").put(checkAuth, updatePassword)
+router.route("/password/update").put(authenticateToken, updatePassword)
 
-router.route("/password/forgot-password").post(checkNotAuth, forgotPassword)
+router.route("/password/forgot-password").post(forgotPassword)
 
-router.route("/password/reset/:token").put(checkNotAuth, resetPassword)
+router.route("/password/reset/:token").put(resetPassword)
 
-router.route("/logout").delete(logout)
+router.route("/logout").delete(authenticateToken, logout)
 
 router.route("/invite").post(inviteTester)
+
+router.route("/count-beta-testers").get(countBeta)
+router.route("/count-network").get(countNetwork)
 
 router.route("/send-newsletter").post(sendNewsletter)
 
