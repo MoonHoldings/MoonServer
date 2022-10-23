@@ -90,6 +90,34 @@ exports.getCoins = asyncErrorHandler(async (req, res, next) => {
   })
 })
 
+exports.getCoin = asyncErrorHandler(async (req, res, next) => {
+  const coinId = req.body.coinId
+  const NOMICS_KEY = process.env.NOMICS_KEY
+
+  const response = await axios.get(
+    `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${coinId}&intervals=1d,30d`
+  )
+
+  const coin = response.data[0]
+
+  const _24hr = coin["1d"] ? coin["1d"]["price_change_pct"] : ""
+
+  const gottenCoin = {
+    id: coin?.id,
+    symbol: coin?.symbol,
+    name: coin?.name,
+    price: coin?.price,
+    logo_url: coin?.logo_url,
+    _24hr,
+    wallets: [],
+  }
+
+  res.status(200).json({
+    success: true,
+    coin: gottenCoin,
+  })
+})
+
 exports.refreshCoins = asyncErrorHandler(async (req, res, next) => {
   const cryptoCoins = req.body.cryptoCoins
   const NOMICS_KEY = process.env.NOMICS_KEY

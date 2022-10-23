@@ -2,6 +2,7 @@ const express = require("express")
 const {
   saveAllCoins,
   getCoins,
+  getCoin,
   saveCoin,
   updateCoin,
   removeCoin,
@@ -15,6 +16,8 @@ const router = express.Router()
 router.route("/save-coins").get(saveAllCoins) //cron job
 
 // router.route("/portfolio-coins").get(checkAuth, getCoins)
+
+router.route("/get-coin").post(authenticateToken, getCoin)
 
 router.route("/save-coin").put(authenticateToken, saveCoin)
 
