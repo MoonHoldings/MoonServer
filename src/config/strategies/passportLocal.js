@@ -4,6 +4,7 @@ const { compare } = require("bcrypt")
 
 const ErrorHandler = require("../../utils/errorHandler")
 const { Users } = require("../firebase")
+const refreshCoinPrices = require("../../utils/refreshCoinPrices")
 
 module.exports = (passport) => {
   passport.use(
@@ -56,6 +57,7 @@ module.exports = (passport) => {
       const qSnapshot = await getDocs(q)
 
       const user = await qSnapshot.docs[0].data()
+      user.portfolio.coins = await refreshCoinPrices(user.email)
       return done(null, user)
     } catch (err) {
       return done(err, null)
