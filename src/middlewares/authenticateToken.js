@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
   if (!decoded) {
     return next(new ErrorHandler("Something went wrong", 403))
   } else {
-    req.user = user
+    req.user = decoded
     next()
   }
 }

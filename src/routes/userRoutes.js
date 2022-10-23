@@ -13,6 +13,7 @@ const {
   countNetwork,
   sendNewsletter,
 } = require("../controllers/userControllers")
+const authenticateToken = require("../middlewares/authenticateToken")
 const checkAuth = require("../middlewares/checkAuth")
 const checkNotAuth = require("../middlewares/checkNotAuth")
 const validatePassword = require("../middlewares/validatePassword")
@@ -27,13 +28,13 @@ router.route("/confirm-email/confirm-token/:token").get(confirmedEmail)
 router.route("/login").post(loginUser)
 // router.route("/login").post(passport.authenticate("local"), loginUser)
 
-router.route("/password/update").put(checkAuth, updatePassword)
+router.route("/password/update").put(authenticateToken, updatePassword)
 
-router.route("/password/forgot-password").post(checkNotAuth, forgotPassword)
+router.route("/password/forgot-password").post(forgotPassword)
 
-router.route("/password/reset/:token").put(checkNotAuth, resetPassword)
+router.route("/password/reset/:token").put(resetPassword)
 
-router.route("/logout").delete(logout)
+router.route("/logout").delete(authenticateToken, logout)
 
 router.route("/invite").post(inviteTester)
 
