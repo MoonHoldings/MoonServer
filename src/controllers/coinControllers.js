@@ -10,7 +10,6 @@ const {
 } = require("firebase/firestore")
 const { db, Users } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
-const refreshCoinPrices = require("../utils/refreshCoinPrices")
 
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
@@ -91,8 +90,68 @@ exports.getCoins = asyncErrorHandler(async (req, res, next) => {
   })
 })
 
+exports.getCoin = asyncErrorHandler(async (req, res, next) => {
+  const coinId = req.body.coinId
+  const NOMICS_KEY = process.env.NOMICS_KEY
+
+  const response = await axios.get(
+    `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${coinId}&intervals=1d,30d`
+  )
+
+  const coin = response.data[0]
+
+  const _24hr = coin["1d"] ? coin["1d"]["price_change_pct"] : ""
+
+  const gottenCoin = {
+    id: coin?.id,
+    symbol: coin?.symbol,
+    name: coin?.name,
+    price: coin?.price,
+    logo_url: coin?.logo_url,
+    _24hr,
+    wallets: [],
+  }
+
+  res.status(200).json({
+    success: true,
+    coin: gottenCoin,
+  })
+})
+
 exports.refreshCoins = asyncErrorHandler(async (req, res, next) => {
-  const updatedCoins = await refreshCoinPrices(req.body.email)
+  const cryptoCoins = req.body.cryptoCoins
+  const NOMICS_KEY = process.env.NOMICS_KEY
+  const updatedCoins = []
+
+  for (let i = 0; i < cryptoCoins.length; i++) {
+    const response = await axios.get(
+      `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${cryptoCoins[i].id}&intervals=1d,30d`
+    )
+
+    const fetchedCoin = await response.data[0]
+
+    const allWallets = cryptoCoins[i].wallets
+    const updatedWallets = allWallets?.map((wallet) => {
+      const updatedValue = fetchedCoin.price * Number(wallet.holding)
+      return { ...wallet, value: updatedValue }
+    })
+
+    let newTotalValue = 0
+    updatedWallets?.forEach((wallet) => {
+      newTotalValue += wallet.value
+    })
+
+    const _24hr = fetchedCoin["1d"] ? fetchedCoin["1d"]["price_change_pct"] : ""
+
+    const updatedCoin = {
+      ...cryptoCoins[i],
+      _24hr,
+      price: fetchedCoin.price,
+      totalValue: newTotalValue,
+    }
+
+    updatedCoins.push(updatedCoin)
+  }
 
   res.status(200).json({
     success: true,

@@ -4,7 +4,6 @@ const { compare } = require("bcrypt")
 
 const ErrorHandler = require("../../utils/errorHandler")
 const { Users } = require("../firebase")
-const refreshCoinPrices = require("../../utils/refreshCoinPrices")
 
 module.exports = (passport) => {
   passport.use(
