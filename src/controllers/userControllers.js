@@ -252,7 +252,11 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     return next(new ErrorHandler("Every field needs to be fulfilled", 400))
   }
 
-  const q = query(Users, where("email", "==", email))
+  const q = query(
+    Users,
+    where("email", "==", email),
+    where("strategy", "==", "local")
+  )
   const qSnapshot = await getDocs(q)
 
   if (qSnapshot.docs.length === 0) {
@@ -281,7 +285,7 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      accessToken
+      accessToken,
     })
   } else {
     res.status(401).json({
