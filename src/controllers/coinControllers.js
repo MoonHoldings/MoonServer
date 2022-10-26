@@ -10,6 +10,8 @@ const {
 } = require("firebase/firestore")
 const { db, Users } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
+const addHistoricalCoin = require("../utils/addHistoricalCoin")
+const ErrorHandler = require("../utils/errorHandler")
 
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
@@ -177,6 +179,11 @@ exports.saveCoin = asyncErrorHandler(async (req, res, next) => {
     portfolio: theUser.portfolio,
   })
 
+  const saveHistory = await addHistoricalCoin(req.body.email, coin)
+  if (!saveHistory.success) {
+    return next(new ErrorHandler(saveHistory.message, 500))
+  }
+
   res.status(200).json({
     success: true,
   })
@@ -201,6 +208,11 @@ exports.updateCoin = asyncErrorHandler(async (req, res, next) => {
   await updateDoc(docRef, {
     portfolio: theUser.portfolio,
   })
+
+  const saveHistory = await addHistoricalCoin(req.body.email, coin)
+  if (!saveHistory.success) {
+    return next(new ErrorHandler(saveHistory.message, 500))
+  }
 
   res.status(200).json({
     success: true,
