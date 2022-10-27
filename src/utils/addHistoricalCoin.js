@@ -2,74 +2,64 @@ const {
   query,
   where,
   getDocs,
-  doc,
   setDoc,
+  doc,
   updateDoc,
 } = require("firebase/firestore")
-const { Historical, Users, db } = require("../config/firebase")
+const { Historical, db } = require("../config/firebase")
 
-module.exports = async (email, coin) => {
+module.exports = async (email, userId, cryptoCoins) => {
   const date = new Date().toUTCString()
 
   try {
-    let qUserSnap, userId, hRef
+    let hRef
+    const todayCoins = []
 
-    const q = await query(Historical, where("email", "==", email))
+    const q = query(Historical, where("email", "==", email))
     const qSnapshot = await getDocs(q)
 
     if (qSnapshot.docs.length === 0) {
-      //get user id
-      const qUser = await query(
-        Users,
-        where("strategy", "==", "local"),
-        where("email", "==", email)
-      )
-      qUserSnap = await getDocs(qUser)
-      userId = qUserSnap.docs[0].id
+      cryptoCoins.forEach((coin) => {
+        todayCoins.push({
+          id: coin.id,
+          holdings: coin.totalHoldings,
+        })
+      })
 
-      //set historical data with this user id
       hRef = await doc(db, "historical", userId)
       await setDoc(hRef, {
         email,
         coins_history: [
           {
             date,
-            coins: [
-              {
-                id: coin.id,
-                holdings: coin.totalHoldings,
-              },
-            ],
+            coins: todayCoins,
           },
         ],
         nft_history: [],
       })
     } else {
-      const record = qSnapshot.docs[0]
+      const hRecord = qSnapshot.docs[0]
         .data()
-        .coins_history.find((history) => history.date === date)
-      const recordIndex = qSnapshot.docs[0]
+        .coins_history.find((coinObj) => coinObj.date === date)
+      const hRecordIndex = qSnapshot.docs[0]
         .data()
-        .coins_history.find((history) => history.date === date)
+        .coins_history.findIndex((coinObj) => coinObj.date === date)
 
-      if (record) {
-        qSnapshot.docs[0].data().coins_history[recordIndex].coins.push({
-          id: coin.id,
-          holdings: coin.totalHoldings,
-        })
+      const historyCoins = cryptoCoins.map((coin) => ({
+        id: coin.id,
+        holdings: coin.totalHoldings,
+      }))
+
+      if (hRecord) {
+        qSnapshot.docs[0].data().coins_history[hRecordIndex].coins =
+          historyCoins
       } else {
         qSnapshot.docs[0].data().coins_history.push({
           date,
-          coins: [
-            {
-              id: coin.id,
-              holdings: coin.totalHoldings,
-            },
-          ],
+          coins: historyCoins,
         })
       }
 
-      // update coins_history
       await updateDoc(hRef, {
         coins_history: qSnapshot.docs[0].data().coins_history,
       })
@@ -77,7 +67,7 @@ module.exports = async (email, coin) => {
 
     return {
       success: true,
-      message: "The coin has been saved to historical data",
+      message: "History saved successfully!",
     }
   } catch (error) {
     return {
