@@ -11,6 +11,7 @@ const {
   inviteTester,
   countBeta,
   countNetwork,
+  countUsers,
   sendNewsletter,
 } = require("../controllers/userControllers")
 const authenticateToken = require("../middlewares/authenticateToken")
@@ -38,8 +39,12 @@ router.route("/logout").delete(authenticateToken, logout)
 
 router.route("/invite").post(inviteTester)
 
-router.route("/count-beta-testers").get(countBeta)
-router.route("/count-network").get(countNetwork)
+// ? Admin
+router.route("/count-beta-testers").get(countBeta) // curl http://localhost:9000/api/count-beta-testers
+
+router.route("/count-network").get(countNetwork) // curl "http://localhost:9000/api/count-network"
+
+router.route("/count-users").get(countUsers) // curl "http://localhost:9000/api/count-users"
 
 router.route("/send-newsletter").post(sendNewsletter)
 
