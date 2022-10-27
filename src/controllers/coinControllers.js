@@ -179,10 +179,15 @@ exports.saveCoin = asyncErrorHandler(async (req, res, next) => {
     portfolio: theUser.portfolio,
   })
 
-  // const saveHistory = await addHistoricalCoin(req.body.email, coin)
-  // if (!saveHistory.success) {
-  //   return next(new ErrorHandler(saveHistory.message, 500))
-  // }
+  const result = await addHistoricalCoin(
+    req.body.email,
+    qSnapshot.docs[0].id,
+    theUser.portfolio.coins
+  )
+
+  if (!result.success) {
+    next(new ErrorHandler(result.message, 500))
+  }
 
   res.status(200).json({
     success: true,
@@ -209,10 +214,15 @@ exports.updateCoin = asyncErrorHandler(async (req, res, next) => {
     portfolio: theUser.portfolio,
   })
 
-  // const saveHistory = await addHistoricalCoin(req.body.email, coin)
-  // if (!saveHistory.success) {
-  //   return next(new ErrorHandler(saveHistory.message, 500))
-  // }
+  const result = await addHistoricalCoin(
+    req.body.email,
+    qSnapshot.docs[0].id,
+    theUser.portfolio.coins
+  )
+
+  if (!result.success) {
+    return next(new ErrorHandler(result.message, 500))
+  }
 
   res.status(200).json({
     success: true,
@@ -237,6 +247,16 @@ exports.removeCoin = asyncErrorHandler(async (req, res, next) => {
   await updateDoc(docRef, {
     portfolio: theUser.portfolio,
   })
+
+  const result = await addHistoricalCoin(
+    req.body.email,
+    qSnapshot.docs[0].id,
+    theUser.portfolio.coins
+  )
+
+  if (!result.success) {
+    return next(new ErrorHandler(result.message, 500))
+  }
 
   res.status(200).json({
     success: true,
