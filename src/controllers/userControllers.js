@@ -359,12 +359,22 @@ exports.countBeta = asyncErrorHandler(async (req, res, next) => {
     betaTesters: docSnap.docs.length,
   })
 })
+
 exports.countNetwork = asyncErrorHandler(async (req, res, next) => {
   const docSnap = await getDocs(InvestorNetwork)
 
   res.json({
     success: true,
     InvestorNetwork: docSnap.docs.length,
+  })
+})
+
+exports.countUsers = asyncErrorHandler(async (req, res, next) => {
+  const docSnap = await getDocs(Users)
+
+  res.json({
+    success: true,
+    users: docSnap.docs.length,
   })
 })
 
