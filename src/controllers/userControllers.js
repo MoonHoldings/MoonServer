@@ -25,7 +25,6 @@ const {
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
 const sendResetToken = require("../utils/sendResetToken")
-const sendEmail = require("../utils/sendEmail")
 const usernameGenerator = require("../utils/usernameGenerator")
 const sendConfirmToken = require("../utils/sendConfirmToken")
 const sendConfirmEmail = require("../utils/sendConfirmEmail")
