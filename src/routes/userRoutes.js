@@ -13,6 +13,7 @@ const {
   countNetwork,
   countUsers,
   sendNewsletter,
+  getHistory,
 } = require("../controllers/userControllers")
 const authenticateToken = require("../middlewares/authenticateToken")
 const checkAuth = require("../middlewares/checkAuth")
@@ -47,6 +48,8 @@ router.route("/count-network").get(countNetwork) // curl "http://localhost:9000/
 router.route("/count-users").get(countUsers) // curl "http://localhost:9000/api/count-users"
 
 router.route("/send-newsletter").post(sendNewsletter)
+
+router.route("/get-history").get(authenticateToken, getHistory)
 
 // For discord authentication
 router.get("/auth/discord", passport.authenticate("discord"))

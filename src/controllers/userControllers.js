@@ -21,6 +21,7 @@ const {
   InvestorNetwork,
   TestNetwork,
   db,
+  Historical,
 } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
@@ -400,5 +401,20 @@ exports.sendNewsletter = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: `Email sent to ${snapshot.docs.length} email addresses.`,
+  })
+})
+
+exports.getHistory = asyncErrorHandler(async (req, res, next) => {
+  const allHistoricalData = []
+
+  const qSnapshot = await getDocs(Historical)
+
+  qSnapshot.docs.forEach((doc) => {
+    allHistoricalData.push(doc.data())
+  })
+
+  res.status(200).json({
+    success: true,
+    historicalData: allHistoricalData,
   })
 })
