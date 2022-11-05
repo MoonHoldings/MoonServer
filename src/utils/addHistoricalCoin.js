@@ -8,28 +8,12 @@ const {
 } = require("firebase/firestore")
 const { Historical, db } = require("../config/firebase")
 
-const monthNames = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-]
-
 module.exports = async (email, userId, cryptoCoins) => {
   const utc_time = new Date()
   const date = utc_time.getUTCDate()
   const monthNum = utc_time.getUTCMonth()
-  const month = monthNames[monthNum]
   const year = utc_time.getUTCFullYear()
-  const utc_date = `${date} ${month}, ${year}`
+  const utc_date = `${monthNum + 1}-${date}-${year}`
 
   try {
     const todayCoins = []
