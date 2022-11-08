@@ -29,6 +29,7 @@ const sendResetToken = require("../utils/sendResetToken")
 const usernameGenerator = require("../utils/usernameGenerator")
 const sendConfirmToken = require("../utils/sendConfirmToken")
 const sendConfirmEmail = require("../utils/sendConfirmEmail")
+const addHistoricalCoin = require("../utils/addHistoricalCoin")
 
 // Register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
@@ -282,6 +283,15 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
       },
       process.env.JWT_SECRET
     )
+
+    const historyResult = await addHistoricalCoin(
+      user.email,
+      qSnapshot.docs[0].id,
+      user.portfolio.coins
+    )
+    if (!historyResult.success) {
+      return next(new ErrorHandler(historyResult.message, 500))
+    }
 
     return res.status(200).json({
       success: true,
