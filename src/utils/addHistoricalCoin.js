@@ -8,7 +8,7 @@ const {
 } = require("firebase/firestore")
 const { Historical, db } = require("../config/firebase")
 
-module.exports = async (email, userId, cryptoCoins) => {
+module.exports = async (email, userId, cryptoCoins, isLogin = false) => {
   const utc_time = new Date()
   const date = utc_time.getUTCDate()
   const monthNum = utc_time.getUTCMonth()
@@ -43,6 +43,12 @@ module.exports = async (email, userId, cryptoCoins) => {
         nft_history: [],
       })
     } else {
+      if (isLogin === true) {
+        return {
+          success: true,
+        }
+      }
+
       historyCoins = qSnapshot.docs[0].data().coins_history
 
       const todayHistory = historyCoins.find(

@@ -287,7 +287,8 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     const historyResult = await addHistoricalCoin(
       user.email,
       qSnapshot.docs[0].id,
-      user.portfolio.coins
+      user.portfolio.coins,
+      true
     )
     if (!historyResult.success) {
       return next(new ErrorHandler(historyResult.message, 500))
