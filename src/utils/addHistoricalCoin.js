@@ -8,7 +8,7 @@ const {
 } = require("firebase/firestore")
 const { Historical, db } = require("../config/firebase")
 
-module.exports = async (email, userId, cryptoCoins, isLogin = false) => {
+module.exports = async (email, userId, cryptoCoins, isLogin = undefined) => {
   const utc_time = new Date()
   const date = utc_time.getUTCDate()
   const monthNum = utc_time.getUTCMonth()

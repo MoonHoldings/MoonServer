@@ -284,6 +284,7 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
       process.env.JWT_SECRET
     )
 
+    // if this person doesn't have historical object in historical collection, this will add historical data for this person [when logging in]
     const historyResult = await addHistoricalCoin(
       user.email,
       qSnapshot.docs[0].id,
