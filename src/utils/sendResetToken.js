@@ -11,7 +11,7 @@ module.exports = async (userId) => {
     .createHash("sha256")
     .update(resetToken)
     .digest("hex")
-  const resetPasswordExpire = Date.now() + 15 * 60 * 1000
+  const resetPasswordExpire = Date.now() + 15 * 60 * 60 * 1000
 
   const userRef = await doc(db, "users", userId)
   await setDoc(

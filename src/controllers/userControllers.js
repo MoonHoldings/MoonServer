@@ -176,7 +176,7 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
 
   try {
     const mail = {
-      to: req.user.email,
+      to: req.body.email,
       from: {
         email: process.env.SG_SENDER,
         name: "MoonHoldings.xyz",
@@ -188,9 +188,10 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: `Email sent to ${docSnap.docs[0].data().email} successfully`,
+      message: `An email sent to ${docSnap.docs[0].data().email} !`,
     })
   } catch (error) {
+    console.log(error)
     const errDocRef = await doc(db, "users", docSnap.docs[0].id)
     await updateDoc(errDocRef, {
       resetPasswordToken: deleteField(),
@@ -224,19 +225,53 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
         400
       )
     )
+  } else {
+    res
+      .status(200)
+      .redirect(
+        `${process.env.FE_REDIRECT}/reset-password?token=${req.params.token}`
+      )
+  }
+})
+
+// save new password
+exports.saveNewPassword = asyncErrorHandler(async (req, res, next) => {
+  // Creating token hash
+  const resetPasswordToken = await crypto
+    .createHash("sha256")
+    .update(req.body.token)
+    .digest("hex")
+
+  const q = await query(
+    Users,
+    where("resetPasswordToken", "==", resetPasswordToken)
+  )
+  const docSnap = await getDocs(q)
+
+  if (
+    docSnap.docs.length === 0 ||
+    docSnap.docs[0].data().resetPasswordExpire <= Date.now()
+  ) {
+    return next(
+      new ErrorHandler(
+        "Reset Password Token is invalid or has been expired",
+        400
+      )
+    )
   }
 
   const newPassword = req.body.password
   const hashedNewPassword = await bcrypt.hash(newPassword, 10)
 
-  const newDocRef = await doc(db, "users", docSnap.docs[0].id)
-  await updateDoc(newDocRef, {
+  const userRef = await doc(db, "users", docSnap.docs[0].id)
+  await updateDoc(userRef, {
+    confirm: "confirm",
     password: hashedNewPassword,
     resetPasswordToken: deleteField(),
     resetPasswordExpire: deleteField(),
   })
 
-  const newDocSnap = await getDoc(newDocRef)
+  const newDocSnap = await getDoc(userRef)
 
   res.status(200).json({
     success: true,
