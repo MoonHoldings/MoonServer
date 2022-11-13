@@ -7,6 +7,7 @@ const {
   updatePassword,
   forgotPassword,
   resetPassword,
+  saveNewPassword,
   confirmedEmail,
   inviteTester,
   countBeta,
@@ -34,7 +35,9 @@ router.route("/password/update").put(authenticateToken, updatePassword)
 
 router.route("/password/forgot-password").post(forgotPassword)
 
-router.route("/password/reset/:token").put(resetPassword)
+router.route("/password/reset/:token").get(resetPassword)
+
+router.route("/password/reset/new-password").put(saveNewPassword)
 
 router.route("/logout").delete(authenticateToken, logout)
 
