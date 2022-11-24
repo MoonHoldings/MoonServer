@@ -1,6 +1,6 @@
 {
   "name": "moonserver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MoonHoldings Server",
   "author": "Leon <leon@moonholdings.xyz> (https://twitter.com/leongaban)",
   "contributors": [
@@ -11,6 +11,7 @@
   "license": "(MIT)",
   "main": "index.js",
   "scripts": {
+    "build": "npm install",
     "dev": "nodemon index.js",
     "start": "node index.js"
   },
