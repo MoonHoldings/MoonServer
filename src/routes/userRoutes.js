@@ -7,11 +7,14 @@ const {
   updatePassword,
   forgotPassword,
   resetPassword,
+  saveNewPassword,
   confirmedEmail,
   inviteTester,
   countBeta,
   countNetwork,
+  countUsers,
   sendNewsletter,
+  getHistory,
 } = require("../controllers/userControllers")
 const authenticateToken = require("../middlewares/authenticateToken")
 const checkAuth = require("../middlewares/checkAuth")
@@ -32,16 +35,24 @@ router.route("/password/update").put(authenticateToken, updatePassword)
 
 router.route("/password/forgot-password").post(forgotPassword)
 
-router.route("/password/reset/:token").put(resetPassword)
+router.route("/password/reset/:token").get(resetPassword)
+
+router.route("/password/reset/new-password").put(saveNewPassword)
 
 router.route("/logout").delete(authenticateToken, logout)
 
 router.route("/invite").post(inviteTester)
 
-router.route("/count-beta-testers").get(countBeta)
-router.route("/count-network").get(countNetwork)
+// ? Admin
+router.route("/count-beta-testers").get(countBeta) // curl http://localhost:9000/api/count-beta-testers
+
+router.route("/count-network").get(countNetwork) // curl "http://localhost:9000/api/count-network"
+
+router.route("/count-users").get(countUsers) // curl "http://localhost:9000/api/count-users"
 
 router.route("/send-newsletter").post(sendNewsletter)
+
+router.route("/get-history").get(authenticateToken, getHistory)
 
 // For discord authentication
 router.get("/auth/discord", passport.authenticate("discord"))

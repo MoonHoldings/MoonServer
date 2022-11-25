@@ -18,6 +18,7 @@ exports.db = db
 exports.Users = collection(db, "users")
 exports.Coins = collection(db, "coins")
 exports.Usernames = collection(db, "usernames")
+exports.Historical = collection(db, "historical")
 exports.BetaTesters = collection(db, "betaTesters")
 exports.InvestorNetwork = collection(db, "investorNetwork")
 exports.TestNetwork = collection(db, "testNetwork")
