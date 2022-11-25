@@ -21,14 +21,15 @@ const {
   InvestorNetwork,
   TestNetwork,
   db,
+  Historical,
 } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
 const sendResetToken = require("../utils/sendResetToken")
-const sendEmail = require("../utils/sendEmail")
 const usernameGenerator = require("../utils/usernameGenerator")
 const sendConfirmToken = require("../utils/sendConfirmToken")
 const sendConfirmEmail = require("../utils/sendConfirmEmail")
+const addHistoricalCoin = require("../utils/addHistoricalCoin")
 
 // Register a user
 exports.registerUser = asyncErrorHandler(async (req, res, next) => {
@@ -175,7 +176,7 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
 
   try {
     const mail = {
-      to: req.user.email,
+      to: req.body.email,
       from: {
         email: process.env.SG_SENDER,
         name: "MoonHoldings.xyz",
@@ -187,9 +188,10 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: `Email sent to ${docSnap.docs[0].data().email} successfully`,
+      message: `An email sent to ${docSnap.docs[0].data().email} !`,
     })
   } catch (error) {
+    console.log(error)
     const errDocRef = await doc(db, "users", docSnap.docs[0].id)
     await updateDoc(errDocRef, {
       resetPasswordToken: deleteField(),
@@ -223,19 +225,53 @@ exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
         400
       )
     )
+  } else {
+    res
+      .status(200)
+      .redirect(
+        `${process.env.FE_REDIRECT}/reset-password?token=${req.params.token}`
+      )
+  }
+})
+
+// save new password
+exports.saveNewPassword = asyncErrorHandler(async (req, res, next) => {
+  // Creating token hash
+  const resetPasswordToken = await crypto
+    .createHash("sha256")
+    .update(req.body.token)
+    .digest("hex")
+
+  const q = await query(
+    Users,
+    where("resetPasswordToken", "==", resetPasswordToken)
+  )
+  const docSnap = await getDocs(q)
+
+  if (
+    docSnap.docs.length === 0 ||
+    docSnap.docs[0].data().resetPasswordExpire <= Date.now()
+  ) {
+    return next(
+      new ErrorHandler(
+        "Reset Password Token is invalid or has been expired",
+        400
+      )
+    )
   }
 
   const newPassword = req.body.password
   const hashedNewPassword = await bcrypt.hash(newPassword, 10)
 
-  const newDocRef = await doc(db, "users", docSnap.docs[0].id)
-  await updateDoc(newDocRef, {
+  const userRef = await doc(db, "users", docSnap.docs[0].id)
+  await updateDoc(userRef, {
+    confirm: "confirm",
     password: hashedNewPassword,
     resetPasswordToken: deleteField(),
     resetPasswordExpire: deleteField(),
   })
 
-  const newDocSnap = await getDoc(newDocRef)
+  const newDocSnap = await getDoc(userRef)
 
   res.status(200).json({
     success: true,
@@ -282,6 +318,17 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
       },
       process.env.JWT_SECRET
     )
+
+    // if this person doesn't have historical object in historical collection, this will add historical data for this person [when logging in]
+    const historyResult = await addHistoricalCoin(
+      user.email,
+      qSnapshot.docs[0].id,
+      user.portfolio.coins,
+      true
+    )
+    if (!historyResult.success) {
+      return next(new ErrorHandler(historyResult.message, 500))
+    }
 
     return res.status(200).json({
       success: true,
@@ -359,6 +406,7 @@ exports.countBeta = asyncErrorHandler(async (req, res, next) => {
     betaTesters: docSnap.docs.length,
   })
 })
+
 exports.countNetwork = asyncErrorHandler(async (req, res, next) => {
   const docSnap = await getDocs(InvestorNetwork)
 
@@ -368,9 +416,18 @@ exports.countNetwork = asyncErrorHandler(async (req, res, next) => {
   })
 })
 
+exports.countUsers = asyncErrorHandler(async (req, res, next) => {
+  const docSnap = await getDocs(Users)
+
+  res.json({
+    success: true,
+    users: docSnap.docs.length,
+  })
+})
+
 exports.sendNewsletter = asyncErrorHandler(async (req, res, next) => {
   const investorEmails = []
-  const snapshot = await getDocs(InvestorNetwork)
+  const snapshot = await getDocs(BetaTesters)
   snapshot.docs.forEach((doc) => {
     investorEmails.push(doc.data().email)
   })
@@ -391,5 +448,20 @@ exports.sendNewsletter = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: `Email sent to ${snapshot.docs.length} email addresses.`,
+  })
+})
+
+exports.getHistory = asyncErrorHandler(async (req, res, next) => {
+  const allHistoricalData = []
+
+  const qSnapshot = await getDocs(Historical)
+
+  qSnapshot.docs.forEach((doc) => {
+    allHistoricalData.push(doc.data())
+  })
+
+  res.status(200).json({
+    success: true,
+    historicalData: allHistoricalData,
   })
 })
