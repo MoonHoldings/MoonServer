@@ -12,6 +12,7 @@ const { db, Users } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const addHistoricalCoin = require("../utils/addHistoricalCoin")
 const ErrorHandler = require("../utils/errorHandler")
+const getCoinHistory = require("../utils/getCoinHistory")
 
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
@@ -66,7 +67,6 @@ exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
 
     coinsArr.push(coinObj)
   })
-  //////////////////
 
   const coinRef = await doc(db, "coins", "all_coins")
   await setDoc(coinRef, { coins: coinsArr }, { merge: true })
@@ -191,5 +191,33 @@ exports.removeCoin = asyncErrorHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+  })
+})
+
+exports.getACoin = asyncErrorHandler(async (req, res, next) => {
+  const NOMICS_KEY = process.env.NOMICS_KEY
+  const coinId = req.body.coinId
+
+  const response = await axios.get(
+    `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${coinId}&intervals=1d,30d`
+  )
+
+  const coin = response.data[0]
+
+  res.status(200).json({
+    success: true,
+    coin,
+  })
+})
+
+exports.coinHistory = asyncErrorHandler(async (req, res, next) => {
+  const historicalData = req.body.historicalData
+  const email = req.body.email
+
+  const coinData = await getCoinHistory(historicalData, email)
+
+  res.status(200).json({
+    success: true,
+    coinHistoryData: coinData,
   })
 })
