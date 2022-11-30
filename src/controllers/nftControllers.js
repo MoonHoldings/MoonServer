@@ -21,5 +21,5 @@ exports.nftCollections = asyncErrorHandler(async (req, res, next) => {
 
   const collections = result.result.collections.map((col) => col)
 
-  res.status(200).json({ collections: collections })
+  res.status(200).json({ success: true, collections })
 })
