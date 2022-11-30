@@ -7,6 +7,7 @@ const cors = require("cors")
 
 const userRoutes = require("./src/routes/userRoutes")
 const coinRoutes = require("./src/routes/coinRoutes")
+const nftRoutes = require('./src/routes/nftRoutes')
 
 const errorMiddleware = require("./src/middlewares/error")
 // const passportLocal = require("./src/config/strategies/passportLocal")
@@ -42,6 +43,7 @@ passportTwitter(passport)
 // all the routes
 app.use("/api", userRoutes)
 app.use("/api", coinRoutes)
+app.use("/api", nftRoutes)
 
 app.get("/hello", (req, res) => {
   res.setHeader("Content-Type", "text/html")
