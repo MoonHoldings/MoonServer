@@ -5,6 +5,9 @@ const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const dateInMS = 86400000
 const presentDayMS = Date.now()
 
+// * Combines Promises and returns responses together. (Util)
+const fetchAllPromises = () => Promise.all(array)
+
 module.exports = async (historicalData, email) => {
   const historyValues = []
   const dateLabels = []
@@ -91,6 +94,8 @@ module.exports = async (historicalData, email) => {
   })
 
   const coinsPrices = []
+
+  // TODO convert this to Promise.all
   for (let i = 0; i < allCoins.length; i++) {
     const response = await axios.get(
       `https://api.nomics.com/v1/candles?key=${NOMICS_KEY}&interval=1d&currency=${

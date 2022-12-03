@@ -14,6 +14,7 @@ const addHistoricalCoin = require("../utils/addHistoricalCoin")
 const ErrorHandler = require("../utils/errorHandler")
 const getCoinHistory = require("../utils/getCoinHistory")
 
+// TODO refactor to use Promise.all not for loop
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
   let coinsArr = []
@@ -222,6 +223,7 @@ exports.coinHistory = asyncErrorHandler(async (req, res, next) => {
   })
 })
 
+// TODO refactor to use Promise.all not for loop
 exports.refreshCoins = asyncErrorHandler(async (req, res, next) => {
   const cryptoCoins = req.body.cryptoCoins
   const NOMICS_KEY = process.env.NOMICS_KEY

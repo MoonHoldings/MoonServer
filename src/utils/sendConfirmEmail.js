@@ -21,6 +21,8 @@ module.exports = async (req, docRef, sgMail, email, username) => {
       html: `
       <h1>Hello ${username}!</h1>
       <div style="font-size: 17px; font-weight: semi-bold; color: #494949;">
+        Yes we gave you that randomly generated username, no worries there<br/>
+        will be a way in the future to change it :)<br/>
         Please confirm your email address to complete sign up
       </div>
   
