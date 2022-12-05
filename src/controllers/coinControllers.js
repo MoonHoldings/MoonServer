@@ -223,18 +223,21 @@ exports.coinHistory = asyncErrorHandler(async (req, res, next) => {
   })
 })
 
-// TODO refactor to use Promise.all not for loop
 exports.refreshCoins = asyncErrorHandler(async (req, res, next) => {
   const cryptoCoins = req.body.cryptoCoins
   const NOMICS_KEY = process.env.NOMICS_KEY
   const updatedCoins = []
 
-  for (let i = 0; i < cryptoCoins.length; i++) {
-    const response = await axios.get(
-      `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${cryptoCoins[i].id}&intervals=1d,30d`
-    )
+  const cryptoCoinIdsText = cryptoCoins.map((crypto) => crypto.id).join(",")
+  const response = await axios.get(
+    `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${cryptoCoinIdsText}&intervals=1d,30d`
+  )
+  const fetchedCoins = response.data
 
-    const fetchedCoin = await response.data[0]
+  for (let i = 0; i < cryptoCoins.length; i++) {
+    const fetchedCoin = fetchedCoins.find(
+      (coin) => coin.id === cryptoCoins[i].id
+    )
 
     const allWallets = cryptoCoins[i].wallets
     const updatedWallets = allWallets?.map((wallet) => {
@@ -255,7 +258,6 @@ exports.refreshCoins = asyncErrorHandler(async (req, res, next) => {
       price: fetchedCoin.price,
       totalValue: newTotalValue,
     }
-
     updatedCoins.push(updatedCoin)
   }
 
