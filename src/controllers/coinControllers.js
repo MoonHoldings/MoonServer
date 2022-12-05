@@ -222,26 +222,6 @@ exports.coinHistory = asyncErrorHandler(async (req, res, next) => {
   })
 })
 
-// exports.refreshCoins3 = asyncErrorHandler(async (req, res, next) => {
-//   const cryptoCoins = req.body.cryptoCoins
-//   const NOMICS_KEY = process.env.NOMICS_KEY
-//   const updatedCoins = []
-
-//   const promiseResult = []
-//   Promise.all(
-//     cryptoCoins.map((coin) => {
-//       return new Promise((resolve, reject) => {
-//         axios
-//           .get(
-//             `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&ids=${coin.id}&intervals=1d,30d`
-//           )
-//           .then((response) => {
-//             const fetchedCoin = response.data[0]
-//           })
-//       })
-//     })
-//   )
-// })
 exports.refreshCoins = asyncErrorHandler(async (req, res, next) => {
   const cryptoCoins = req.body.cryptoCoins
   const NOMICS_KEY = process.env.NOMICS_KEY
