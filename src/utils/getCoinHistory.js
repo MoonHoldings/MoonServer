@@ -5,6 +5,9 @@ const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const dateInMS = 86400000
 const presentDayMS = Date.now()
 
+// * Combines Promises and returns responses together. (Util)
+const fetchAllPromises = () => Promise.all(array)
+
 module.exports = async (historicalData, email) => {
   const historyValues = []
   const dateLabels = []
@@ -120,7 +123,6 @@ module.exports = async (historicalData, email) => {
         _7dPrices: singleCoinPrices.candles,
       })
   })
-  //===================================================================================
 
   _7dHistories.forEach((day, dayIndex) => {
     let valueSum = 0
