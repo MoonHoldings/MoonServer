@@ -93,24 +93,36 @@ module.exports = async (historicalData, email) => {
     }
   })
 
-  const coinsPrices = []
+  let coinsPrices = []
 
-  // TODO convert this to Promise.all
-  for (let i = 0; i < allCoins.length; i++) {
-    const response = await axios.get(
-      `https://api.nomics.com/v1/candles?key=${NOMICS_KEY}&interval=1d&currency=${
-        allCoins[i].id
-      }&start=${getISOFormat(weekInMS[0])}&end=${getISOFormat(
-        weekInMS[weekInMS.length - 1]
-      )}`
-    )
+  const results = await Promise.all(
+    allCoins.map((coin) => {
+      return new Promise((resolve, reject) => {
+        axios
+          .get(
+            `https://api.nomics.com/v1/candles?key=${NOMICS_KEY}&interval=1d&currency=${
+              coin.id
+            }&start=${getISOFormat(weekInMS[0])}&end=${getISOFormat(
+              weekInMS[weekInMS.length - 1]
+            )}`
+          )
+          .then((response) => {
+            const candles = response.data.map((c) => c.close)
 
-    const candles = response.data.map((c) => c.close)
-    coinsPrices.push({
-      id: allCoins[i].id,
-      _7dPrices: candles,
+            resolve({ id: coin.id, candles })
+          })
+      })
     })
-  }
+  )
+
+  allCoins.forEach((coin) => {
+    const singleCoinPrices = results.find((result) => result.id === coin.id)
+    if (singleCoinPrices)
+      coinsPrices.push({
+        id: coin.id,
+        _7dPrices: singleCoinPrices.candles,
+      })
+  })
 
   _7dHistories.forEach((day, dayIndex) => {
     let valueSum = 0
