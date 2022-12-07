@@ -47,6 +47,9 @@ module.exports = async (historicalData, email) => {
     }
   }
 
+  if (_7dHistories[0] === undefined) {
+  }
+
   // if _7dHistories[0] doesn't exist, go backward by subtracting dateInMS
   let leastGap0 = 0
   let the0History
@@ -59,22 +62,24 @@ module.exports = async (historicalData, email) => {
 
         const subtract = weekInMS[0] - singleHistoryDateMS
 
-        if (singleHistoryDateMS < weekInMS[0] && leastGap0 === 0) {
+        if (i === 0 && subtract > 0) {
           leastGap0 = subtract
+          the0History = singleHistory
         }
 
         if (
-          leastGap0 !== 0 &&
+          i !== 0 &&
           singleHistoryDateMS < weekInMS[0] &&
+          subtract > 0 &&
           subtract < leastGap0
         ) {
           leastGap0 = subtract
           the0History = singleHistory
         }
       }
-      if (leastGap0 === 0) _7dHistories[0] = 0
-
       _7dHistories[0] = the0History
+
+      if (the0History === undefined) _7dHistories[0] = 0
     } else {
       _7dHistories[0] = 0
     }
