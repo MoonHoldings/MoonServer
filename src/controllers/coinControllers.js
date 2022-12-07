@@ -100,7 +100,7 @@ exports.saveCoin = asyncErrorHandler(async (req, res, next) => {
   const qSnapshot = await getDocs(q)
 
   if (qSnapshot.docs.length === 0) {
-    return next("No account found", 401)
+    return next(new ErrorHandler("No account found", 401))
   }
 
   const theUser = qSnapshot.docs[0].data()

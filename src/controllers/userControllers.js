@@ -96,6 +96,7 @@ exports.registerUser = asyncErrorHandler(async (req, res, next) => {
     // Confirm Email after signup
     await sendConfirmEmail(req, docRef, sgMail, email, username)
 
+    console.log("signed up user", docRef.id)
     res.status(200).json({
       success: true,
       message: `Email sent to ${email} successfully`,
@@ -141,7 +142,6 @@ exports.updatePassword = asyncErrorHandler(async (req, res, next) => {
     const newHashedPassword = await bcrypt.hash(newPassword, 10)
     const q = await query(Users, where("email", "==", req.user.email))
     const userSnap = await getDocs(q)
-    console.log(userSnap.docs[0].data())
     await updateDoc(doc(db, "users", userSnap.docs[0].id), {
       password: newHashedPassword,
     })
@@ -191,7 +191,6 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
       message: `An email sent to ${docSnap.docs[0].data().email} !`,
     })
   } catch (error) {
-    console.log(error)
     const errDocRef = await doc(db, "users", docSnap.docs[0].id)
     await updateDoc(errDocRef, {
       resetPasswordToken: deleteField(),
@@ -330,6 +329,7 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
       return next(new ErrorHandler(historyResult.message, 500))
     }
 
+    console.log("logged in user", qSnapshot.docs[0].id)
     return res.status(200).json({
       success: true,
       accessToken,
