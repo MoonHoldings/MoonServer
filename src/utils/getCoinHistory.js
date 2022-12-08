@@ -47,33 +47,42 @@ module.exports = async (historicalData, email) => {
     }
   }
 
+  if (_7dHistories[0] === undefined) {
+  }
+
   // if _7dHistories[0] doesn't exist, go backward by subtracting dateInMS
   let leastGap0 = 0
   let the0History
   if (_7dHistories[0] === undefined) {
-    for (let i = 0; i < userHistoriesObj.coins_history.length; i++) {
-      const singleHistory = userHistoriesObj.coins_history[i]
+    if (userHistoriesObj.coins_history.length !== 0) {
+      for (let i = 0; i < userHistoriesObj.coins_history.length; i++) {
+        const singleHistory = userHistoriesObj.coins_history[i]
 
-      const singleHistoryDateMS = new Date(singleHistory.date).getTime()
+        const singleHistoryDateMS = new Date(singleHistory.date).getTime()
 
-      const subtract = weekInMS[0] - singleHistoryDateMS
+        const subtract = weekInMS[0] - singleHistoryDateMS
 
-      if (singleHistoryDateMS < weekInMS[0] && leastGap0 === 0) {
-        leastGap0 = subtract
+        if (i === 0 && subtract > 0) {
+          leastGap0 = subtract
+          the0History = singleHistory
+        }
+
+        if (
+          i !== 0 &&
+          singleHistoryDateMS < weekInMS[0] &&
+          subtract > 0 &&
+          subtract < leastGap0
+        ) {
+          leastGap0 = subtract
+          the0History = singleHistory
+        }
       }
+      _7dHistories[0] = the0History
 
-      if (
-        leastGap0 !== 0 &&
-        singleHistoryDateMS < weekInMS[0] &&
-        subtract < leastGap0
-      ) {
-        leastGap0 = subtract
-        the0History = singleHistory
-      }
+      if (the0History === undefined) _7dHistories[0] = 0
+    } else {
+      _7dHistories[0] = 0
     }
-    if (leastGap0 === 0) _7dHistories[0] = 0
-
-    _7dHistories[0] = the0History
   }
 
   // if any index is undefined then populate with the previous value
@@ -86,10 +95,12 @@ module.exports = async (historicalData, email) => {
   // get coins from 7dHistories
   const allCoins = []
   _7dHistories.forEach((d) => {
-    for (let i = 0; i < d.coins.length; i++) {
-      const record = allCoins.find((coin) => coin.id === d.coins[i].id)
+    if (d !== 0) {
+      for (let i = 0; i < d.coins.length; i++) {
+        const record = allCoins.find((coin) => coin.id === d.coins[i].id)
 
-      if (!record) allCoins.push(d.coins[i])
+        if (!record) allCoins.push(d.coins[i])
+      }
     }
   })
 
@@ -125,16 +136,21 @@ module.exports = async (historicalData, email) => {
   })
 
   _7dHistories.forEach((day, dayIndex) => {
-    let valueSum = 0
-    for (let i = 0; i < day.coins.length; i++) {
-      const candleCoin = coinsPrices.find((c) => c.id === day.coins[i].id)
+    if (day !== 0) {
+      let valueSum = 0
+      for (let i = 0; i < day.coins.length; i++) {
+        const candleCoin = coinsPrices.find((c) => c.id === day.coins[i].id)
 
-      const totalValue = day.coins[i].holdings * candleCoin._7dPrices[dayIndex]
+        const totalValue =
+          day.coins[i].holdings * candleCoin._7dPrices[dayIndex]
 
-      valueSum += totalValue
+        valueSum += totalValue
+      }
+
+      historyValues.push(valueSum)
+    } else {
+      historyValues.push(day)
     }
-
-    historyValues.push(valueSum)
   })
 
   return {

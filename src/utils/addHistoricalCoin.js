@@ -2,18 +2,19 @@ const {
   query,
   where,
   getDocs,
-  setDoc,
   doc,
+  setDoc,
   updateDoc,
 } = require("firebase/firestore")
 const { Historical, db } = require("../config/firebase")
 
 module.exports = async (email, userId, cryptoCoins, isLogin = undefined) => {
-  const utc_time = new Date()
-  const date = utc_time.getUTCDate()
-  const monthNum = utc_time.getUTCMonth()
-  const year = utc_time.getUTCFullYear()
-  const utc_date = `${monthNum + 1}-${date}-${year}`
+  const jsTimeDate = new Date()
+  const utc_date = jsTimeDate.getUTCDate()
+  const utc_monthNum = jsTimeDate.getUTCMonth()
+  const utc_year = jsTimeDate.getUTCFullYear()
+
+  const utc_formedDate = `${utc_monthNum + 1}-${utc_date}-${utc_year}`
 
   try {
     const todayCoins = []
@@ -25,37 +26,38 @@ module.exports = async (email, userId, cryptoCoins, isLogin = undefined) => {
     const hRef = await doc(db, "historical", userId)
 
     if (qSnapshot.docs.length === 0) {
-      cryptoCoins.forEach((coin) => {
-        todayCoins.push({
-          id: coin.id,
-          holdings: coin.totalHoldings,
+      if (cryptoCoins.length === 0) {
+        await setDoc(hRef, {
+          email,
+          coins_history: [],
+          nft_history: [],
         })
-      })
+      } else {
+        cryptoCoins.forEach((coin) => {
+          todayCoins.push({
+            id: coin.id,
+            holdings: coin.totalHoldings,
+          })
+        })
 
-      await setDoc(hRef, {
-        email,
-        coins_history: [
-          {
-            date: utc_date,
-            coins: todayCoins,
-          },
-        ],
-        nft_history: [],
-      })
-    } else {
-      if (isLogin === true) {
-        return {
-          success: true,
-        }
+        await setDoc(hRef, {
+          email,
+          coins_history: [
+            {
+              date: utc_formedDate,
+              coins: todayCoins,
+            },
+          ],
+          nft_history: [],
+        })
       }
+    } else {
+      if (isLogin === true) return { success: true }
 
       historyCoins = qSnapshot.docs[0].data().coins_history
 
-      const todayHistory = historyCoins.find(
-        (coinObj) => coinObj.date === utc_date
-      )
       const todayHistoryIndex = historyCoins.findIndex(
-        (coinObj) => coinObj.date === utc_date
+        (coinObj) => coinObj.date === utc_formedDate
       )
 
       const mappedCryptoCoins = cryptoCoins.map((coin) => ({
@@ -63,11 +65,11 @@ module.exports = async (email, userId, cryptoCoins, isLogin = undefined) => {
         holdings: coin.totalHoldings,
       }))
 
-      if (todayHistory) {
+      if (todayHistoryIndex !== -1) {
         historyCoins[todayHistoryIndex].coins = mappedCryptoCoins
       } else {
         historyCoins.push({
-          date: utc_date,
+          date: utc_formedDate,
           coins: mappedCryptoCoins,
         })
       }
@@ -79,7 +81,7 @@ module.exports = async (email, userId, cryptoCoins, isLogin = undefined) => {
 
     return {
       success: true,
-      message: "History saved successfully!",
+      message: "History saved successfully",
     }
   } catch (error) {
     return {
