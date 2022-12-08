@@ -55,9 +55,7 @@ router.route("/send-newsletter").post(sendNewsletter)
 
 router.route("/get-history").get(authenticateToken, getHistory)
 
-router
-  .route("/delete-user-account")
-  .delete(authenticateToken, deleteUserAccount)
+router.route("/delete-user-account").post(authenticateToken, deleteUserAccount)
 
 // For discord authentication
 router.get("/auth/discord", passport.authenticate("discord"))
