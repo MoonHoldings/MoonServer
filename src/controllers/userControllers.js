@@ -9,6 +9,7 @@ const {
   deleteField,
   serverTimestamp,
   setDoc,
+  deleteDoc,
 } = require("firebase/firestore")
 const bcrypt = require("bcrypt")
 const crypto = require("crypto")
@@ -339,6 +340,34 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
       success: false,
     })
   }
+})
+
+// User deletes own account
+exports.deleteUserAccount = asyncErrorHandler(async (req, res, next) => {
+  const email = req.body.email
+
+  // delete from users collection
+  const q = await query(
+    Users,
+    where("email", "==", email),
+    where("strategy", "==", "local")
+  )
+  const qSnapshot = await getDocs(q)
+
+  if (qSnapshot.docs.length !== 0)
+    await deleteDoc(doc(db, "users", qSnapshot.docs[0].id))
+
+  // delete from historical collection
+  const hq = await query(Historical, where("email", "==", email))
+  const hQSnapshot = await getDocs(hq)
+
+  if (hQSnapshot.docs.length !== 0)
+    await deleteDoc(doc(db, "historical", hQSnapshot.docs[0].id))
+
+  res.status(200).json({
+    success: true,
+    message: "User deleted successfully",
+  })
 })
 
 exports.logout = asyncErrorHandler(async (req, res, next) => {
