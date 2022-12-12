@@ -14,29 +14,41 @@ const addHistoricalCoin = require("../utils/addHistoricalCoin")
 const ErrorHandler = require("../utils/errorHandler")
 const getCoinHistory = require("../utils/getCoinHistory")
 
-// TODO refactor to use Promise.all not for loop
 exports.saveAllCoins = asyncErrorHandler(async (req, res, next) => {
   const NOMICS_KEY = process.env.NOMICS_KEY
   let coinsArr = []
 
-  for (let i = 0; i < 10; i++) {
-    const response = await axios.get(
-      `https://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&interval=1d,30d&per-page=100&page=${
-        i + 1
-      }&sort=rank`
-    )
+  const results = await Promise.all(
+    Array.from(Array(10).keys()).map((num) => {
+      return new Promise((resolve, reject) => {
+        axios
+          .get(
+            `http://api.nomics.com/v1/currencies/ticker?key=${NOMICS_KEY}&interval=1d,30d&per-page=100&page=${
+              num + 1
+            }&sort=rank`
+          )
+          .then((response) => {
+            const coinsArray = []
+            response.data.forEach((coin) => {
+              const coinObj = {
+                id: coin.id,
+                symbol: coin.symbol,
+                name: coin.name,
+                logo_url: coin.logo_url,
+              }
 
-    response.data.forEach((coin) => {
-      const coinObj = {
-        id: coin.id,
-        symbol: coin.symbol,
-        name: coin.name,
-        logo_url: coin.logo_url,
-      }
+              coinsArray.push(coinObj)
+            })
 
-      coinsArr.push(coinObj)
+            resolve(coinsArray)
+          })
+      })
     })
-  }
+  )
+
+  results.forEach((result) => {
+    coinsArr = [...coinsArr, ...result]
+  })
 
   // extra supported coins array
   const extra_coins = []
