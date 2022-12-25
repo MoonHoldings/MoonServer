@@ -1,17 +1,18 @@
 require("dotenv").config({ path: "./src/config/config.env" })
 
 const express = require("express")
-// const passport = require("passport")
-// const session = require("express-session")
+const cookieParser = require("cookie-parser")
+const session = require("express-session")
+const passport = require("passport")
 const cors = require("cors")
 
 const userRoutes = require("./src/routes/userRoutes")
 const coinRoutes = require("./src/routes/coinRoutes")
-const nftRoutes = require('./src/routes/nftRoutes')
+const nftRoutes = require("./src/routes/nftRoutes")
 
 const errorMiddleware = require("./src/middlewares/error")
 // const passportLocal = require("./src/config/strategies/passportLocal")
-// const passportDiscord = require("./src/config/strategies/passportDiscord")
+const passportDiscord = require("./src/config/strategies/passportDiscord")
 // const passportTwitter = require("./src/config/strategies/passportTwitter")
 
 const app = express()
@@ -21,13 +22,15 @@ app.use(express.urlencoded({ extended: false }))
 app.use(
   cors({
     origin: "*",
+    credentials: true,
   })
 )
-/*
+
+app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
-    name: "moon",
+    name: "MOON_SESSION",
     resave: false,
     saveUninitialized: false,
   })
@@ -35,10 +38,9 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
-passportLocal(passport)
+// passportLocal(passport)
 passportDiscord(passport)
-passportTwitter(passport)
-*/
+// passportTwitter(passport)
 
 // all the routes
 app.use("/api", userRoutes)

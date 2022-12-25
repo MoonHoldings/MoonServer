@@ -1,7 +1,9 @@
 const express = require("express")
 const passport = require("passport")
+const cryptoJS = require("crypto-js")
 const {
   registerUser,
+  getUser,
   loginUser,
   logout,
   updatePassword,
@@ -28,6 +30,8 @@ router.route("/register").post(validatePassword, registerUser)
 // router.route("/confirm-email").post(checkAuth, confirmEmail)
 
 router.route("/confirm-email/confirm-token/:token").get(confirmedEmail)
+
+router.route("/get-user").get(getUser)
 
 router.route("/login").post(loginUser)
 // router.route("/login").post(passport.authenticate("local"), loginUser)
@@ -62,13 +66,17 @@ router.get("/auth/discord", passport.authenticate("discord"))
 router.get(
   "/auth/discord/redirect",
   passport.authenticate("discord", {
-    successRedirect: `${process.env.FE_REDIRECT}`,
     failureRedirect: `${process.env.FE_REDIRECT}/login`,
   }),
-  (req, res) => {
-    res.json({
-      success: true,
-    })
+  async (req, res) => {
+    const secret = await cryptoJS.AES.encrypt(
+      "chander-gopon-tottho",
+      process.env.CRYPTO_SECRET
+    ).toString()
+
+    console.log("77 userRoutes req.user", req.user)
+
+    res.redirect(`${process.env.FE_REDIRECT}/crypto?discord_auth=${secret}`)
   }
 )
 
@@ -77,13 +85,15 @@ router.get("/auth/twitter", passport.authenticate("twitter"))
 router.get(
   "/auth/twitter/callback",
   passport.authenticate("twitter", {
-    successRedirect: `${process.env.FE_REDIRECT}`,
     failureRedirect: `${process.env.FE_REDIRECT}/login`,
   }),
-  (req, res) => {
-    res.json({
-      success: true,
-    })
+  async (req, res) => {
+    const secret = await cryptoJS.AES.encrypt(
+      "chander-gopon-tottho",
+      process.env.CRYPTO_SECRET
+    ).toString()
+
+    res.redirect(`${process.env.FE_REDIRECT}/crypto?twitter_auth=${secret}`)
   }
 )
 

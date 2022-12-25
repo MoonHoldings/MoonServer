@@ -15,6 +15,7 @@ const bcrypt = require("bcrypt")
 const crypto = require("crypto")
 const sgMail = require("@sendgrid/mail")
 const jwt = require("jsonwebtoken")
+const passport = require("passport")
 
 const {
   Users,
@@ -340,6 +341,12 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
       success: false,
     })
   }
+})
+
+// Get User
+exports.getUser = asyncErrorHandler(async (req, res, next) => {
+  console.log("348 getUser req.user", req.user)
+  res.send(req.user)
 })
 
 // User deletes own account

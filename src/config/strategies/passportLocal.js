@@ -19,7 +19,11 @@ module.exports = (passport) => {
         }
 
         try {
-          const q = query(Users, where("email", "==", email))
+          const q = query(
+            Users,
+            where("email", "==", email),
+            where("strategy", "==", "local")
+          )
           const qSnapshot = await getDocs(q)
           if (qSnapshot.docs.length === 0) {
             return done(

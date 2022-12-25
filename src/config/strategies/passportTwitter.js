@@ -1,4 +1,11 @@
-const { query, where, getDocs, addDoc, getDoc } = require("firebase/firestore")
+const {
+  query,
+  where,
+  getDocs,
+  addDoc,
+  getDoc,
+  serverTimestamp,
+} = require("firebase/firestore")
 const { Strategy } = require("passport-twitter")
 const usernameGenerator = require("../../utils/usernameGenerator")
 const { Users } = require("../firebase")
@@ -13,6 +20,7 @@ module.exports = (passport) => {
         includeEmail: true,
       },
       async function (token, tokenSecret, profile, cb) {
+        console.log("profile", profile)
         const userEmail = profile.emails[0].value
         const q = query(
           Users,
@@ -30,6 +38,23 @@ module.exports = (passport) => {
             strategy: "twitter",
             username,
             email: userEmail,
+            confirm: "",
+            confirmEmailExpire: null,
+            createdAt: serverTimestamp(),
+            portfolioStyle: "grid",
+            currency: "usd",
+            activity: {
+              visits: 0,
+              streaks: {
+                _5days: 0,
+                _30days: 0,
+                _100days: 0,
+              },
+            },
+            portfolio: {
+              coins: [],
+              nfts: [],
+            },
           })
           const newUserSnap = await getDoc(newUserRef)
           return cb(null, newUserSnap.data())
@@ -38,21 +63,10 @@ module.exports = (passport) => {
     )
   )
 
-  passport.serializeUser((user, done) => {
-    done(null, user.id)
+  passport.serializeUser(function (user, done) {
+    done(null, user)
   })
-
-  passport.deserializeUser(async (id, done) => {
-    try {
-      const q = query(Users, where("id", "==", id))
-      const qSnapshot = await getDocs(q)
-
-      if (qSnapshot.docs.length !== 0)
-        done(new ErrorHandler("User not found", 404))
-
-      done(null, qSnapshot.docs[0].data())
-    } catch (error) {
-      done(err, null)
-    }
+  passport.deserializeUser(function (obj, done) {
+    done(null, obj)
   })
 }
