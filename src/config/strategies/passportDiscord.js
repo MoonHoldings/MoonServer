@@ -5,11 +5,14 @@ const {
   addDoc,
   getDoc,
   serverTimestamp,
+  setDoc,
+  doc,
+  updateDoc,
 } = require("firebase/firestore")
 const { Strategy } = require("passport-discord")
 const ErrorHandler = require("../../utils/errorHandler")
 const usernameGenerator = require("../../utils/usernameGenerator")
-const { Users } = require("../firebase")
+const { Users, AuthData, db } = require("../firebase")
 
 module.exports = (passport) => {
   passport.use(
@@ -22,17 +25,13 @@ module.exports = (passport) => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          const q = query(
-            Users,
-            where("strategy", "==", "discord"),
-            where("email", "==", profile.email)
-          )
+          const q = query(Users, where("email", "==", profile.email))
           const qSnapshot = await getDocs(q)
-          if (qSnapshot.docs.length !== 0) {
-            return done(null, qSnapshot.docs[0].data())
-          } else {
-            console.log(profile.email)
-            // console.log(profile)
+          qSnapshot.docs.forEach((d) => {
+            console.log(d.id)
+          })
+
+          if (qSnapshot.docs.length === 0) {
             const username = await usernameGenerator(profile.email)
             // create user
             const newUserRef = await addDoc(Users, {
@@ -61,6 +60,23 @@ module.exports = (passport) => {
             // console.log("52 newUserSnap.data()", newUserSnap.data())
             return done(null, newUserSnap.data())
           }
+          if (
+            qSnapshot.docs.length === 1 &&
+            qSnapshot.docs[0].data().strategy === "local"
+          ) {
+            const docRef = await doc(db, "users", qSnapshot.docs[0].id)
+            await updateDoc(docRef, {
+              strategy: "local-discord",
+            })
+            const docSnap = await getDoc(docRef)
+            return done(null, docSnap.data())
+          }
+          if (
+            qSnapshot.docs.length === 1 &&
+            qSnapshot.docs[0].data().strategy === "discord"
+          ) {
+            return done(null, qSnapshot.docs[0].data())
+          }
         } catch (error) {
           return done(error, null)
         }
@@ -72,22 +88,9 @@ module.exports = (passport) => {
     done(null, user)
   })
 
-  passport.deserializeUser((obj, done) => {
-    done(null, { ...obj })
+  passport.deserializeUser(async (obj, done) => {
+    console.log("obj", obj)
+    await setDoc(doc(db, "authData", obj.email), { ...obj })
+    done(null, obj)
   })
-
-  // passport.deserializeUser(async (email, done) => {
-  //   console.log(email)
-  //   try {
-  //     const q = query(Users, where("email", "==", email))
-  //     const qSnapshot = await getDocs(q)
-
-  //     if (qSnapshot.docs.length !== 0)
-  //       done(new ErrorHandler("User not found", 404))
-
-  //     done(null, qSnapshot.docs[0].data())
-  //   } catch (error) {
-  //     done(err, null)
-  //   }
-  // })
 }

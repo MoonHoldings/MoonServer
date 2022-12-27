@@ -74,8 +74,6 @@ router.get(
       process.env.CRYPTO_SECRET
     ).toString()
 
-    console.log("77 userRoutes req.user", req.user)
-
     res.redirect(`${process.env.FE_REDIRECT}/crypto?discord_auth=${secret}`)
   }
 )

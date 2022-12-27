@@ -24,6 +24,7 @@ const {
   TestNetwork,
   db,
   Historical,
+  AuthData,
 } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")
 const ErrorHandler = require("../utils/errorHandler")
@@ -345,8 +346,10 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
 
 // Get User
 exports.getUser = asyncErrorHandler(async (req, res, next) => {
-  console.log("348 getUser req.user", req.user)
-  res.send(req.user)
+  const qSnap = await getDocs(AuthData)
+  const user = qSnap.docs[0].data()
+  await deleteDoc(doc(db, "authData", qSnap.docs[0].id))
+  res.send(user)
 })
 
 // User deletes own account
