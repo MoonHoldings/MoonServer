@@ -1,45 +1,45 @@
 require("dotenv").config({ path: "./src/config/config.env" })
 
 const express = require("express")
+const cors = require("cors")
+const passport = require("passport")
 const cookieParser = require("cookie-parser")
 const session = require("express-session")
-const passport = require("passport")
-const cors = require("cors")
 
 const userRoutes = require("./src/routes/userRoutes")
 const coinRoutes = require("./src/routes/coinRoutes")
 const nftRoutes = require("./src/routes/nftRoutes")
 
 const errorMiddleware = require("./src/middlewares/error")
-// const passportLocal = require("./src/config/strategies/passportLocal")
-const passportDiscord = require("./src/config/strategies/passportDiscord")
+const passportLocal = require("./src/config/strategies/passportLocal")
+// const passportDiscord = require("./src/config/strategies/passportDiscord")
 // const passportTwitter = require("./src/config/strategies/passportTwitter")
 
 const app = express()
 
 app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 )
 
-app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     name: "MOON_SESSION",
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
   })
 )
+app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(passport.initialize())
 app.use(passport.session())
 
-// passportLocal(passport)
-passportDiscord(passport)
+passportLocal(passport)
+// passportDiscord(passport)
 // passportTwitter(passport)
 
 // all the routes

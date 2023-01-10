@@ -26,6 +26,7 @@ module.exports = (passport) => {
           )
           const qSnapshot = await getDocs(q)
           if (qSnapshot.docs.length === 0) {
+            console.log("no acc")
             return done(
               new ErrorHandler(
                 "There is no account associated to this email",
@@ -33,6 +34,7 @@ module.exports = (passport) => {
               )
             )
           }
+          console.log(qSnapshot.docs[0].data())
           const user = await qSnapshot.docs[0].data()
           const isValid = await compare(password, user.password)
 
@@ -51,19 +53,10 @@ module.exports = (passport) => {
   )
 
   passport.serializeUser((user, done) => {
-    return done(null, user.email)
+    return done(null, user)
   })
 
-  passport.deserializeUser(async (email, done) => {
-    try {
-      const q = query(Users, where("email", "==", email))
-      const qSnapshot = await getDocs(q)
-
-      const user = await qSnapshot.docs[0].data()
-      user.portfolio.coins = await refreshCoinPrices(user.email)
-      return done(null, user)
-    } catch (err) {
-      return done(err, null)
-    }
+  passport.deserializeUser((user, done) => {
+    return done(null, user)
   })
 }
