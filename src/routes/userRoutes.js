@@ -33,8 +33,8 @@ router.route("/confirm-email/confirm-token/:token").get(confirmedEmail)
 
 router.route("/get-user").get(getUser)
 
-router.route("/login").post(loginUser)
-// router.route("/login").post(passport.authenticate("local"), loginUser)
+// router.route("/login").post(loginUser)
+router.route("/login").post(passport.authenticate("local"), loginUser)
 
 router.route("/password/update").put(authenticateToken, updatePassword)
 
