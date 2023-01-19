@@ -73,7 +73,9 @@ router.get(
       process.env.CRYPTO_SECRET
     ).toString()
 
-    res.redirect(`${process.env.FE_REDIRECT}/crypto?discord_auth=${secret}`)
+    // res.redirect(`${process.env.FE_REDIRECT}/login`)
+    res.redirect(`${process.env.FE_REDIRECT}/crypto-portfolio`)
+    // res.redirect(`${process.env.FE_REDIRECT}/crypto?discord_auth=${secret}`)
   }
 )
 

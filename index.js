@@ -12,7 +12,7 @@ const nftRoutes = require("./src/routes/nftRoutes")
 
 const errorMiddleware = require("./src/middlewares/error")
 const passportLocal = require("./src/config/strategies/passportLocal")
-// const passportDiscord = require("./src/config/strategies/passportDiscord")
+const passportDiscord = require("./src/config/strategies/passportDiscord")
 // const passportTwitter = require("./src/config/strategies/passportTwitter")
 
 const app = express()
@@ -39,7 +39,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 passportLocal(passport)
-// passportDiscord(passport)
+passportDiscord(passport)
 // passportTwitter(passport)
 
 // all the routes
