@@ -1,6 +1,5 @@
 const express = require("express")
 const passport = require("passport")
-const cryptoJS = require("crypto-js")
 const {
   registerUser,
   getUser,
@@ -68,14 +67,7 @@ router.get(
     failureRedirect: `${process.env.FE_REDIRECT}/login`,
   }),
   async (req, res) => {
-    const secret = await cryptoJS.AES.encrypt(
-      "chander-gopon-tottho",
-      process.env.CRYPTO_SECRET
-    ).toString()
-
-    // res.redirect(`${process.env.FE_REDIRECT}/login`)
     res.redirect(`${process.env.FE_REDIRECT}/crypto-portfolio`)
-    // res.redirect(`${process.env.FE_REDIRECT}/crypto?discord_auth=${secret}`)
   }
 )
 
@@ -87,12 +79,7 @@ router.get(
     failureRedirect: `${process.env.FE_REDIRECT}/login`,
   }),
   async (req, res) => {
-    const secret = await cryptoJS.AES.encrypt(
-      "chander-gopon-tottho",
-      process.env.CRYPTO_SECRET
-    ).toString()
-
-    res.redirect(`${process.env.FE_REDIRECT}/crypto?twitter_auth=${secret}`)
+    res.redirect(`${process.env.FE_REDIRECT}/crypto-portfolio`)
   }
 )
 

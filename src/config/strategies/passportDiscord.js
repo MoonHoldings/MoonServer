@@ -89,8 +89,6 @@ module.exports = (passport) => {
   })
 
   passport.deserializeUser(async (obj, done) => {
-    console.log("obj", obj)
-    await setDoc(doc(db, "authData", obj.email), { ...obj })
     done(null, obj)
   })
 }
