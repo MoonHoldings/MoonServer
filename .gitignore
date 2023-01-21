@@ -1,6 +1,11 @@
+# dependencies
 /node_modules
+.yarn
+
+# local env files
 /src/config/config.env
 /src/config/dev.config.env
 /src/test.js
 
+# misc
 .DS_Store
