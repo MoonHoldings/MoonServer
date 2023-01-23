@@ -16,10 +16,10 @@ module.exports = (passport) => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        callbackURL: "/api/auth/twitter/callback",
+        callbackURL: `/api/auth/twitter/callback`,
         includeEmail: true,
       },
-      async function (token, tokenSecret, profile, cb) {
+      async function (accessToken, refreshToken, profile, cb) {
         console.log("profile", profile)
         const userEmail = profile.emails[0].value
         const q = query(

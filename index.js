@@ -30,7 +30,7 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET,
     name: "MOON_SESSION",
-    resave: true,
+    resave: false,
     saveUninitialized: true,
   })
 )
