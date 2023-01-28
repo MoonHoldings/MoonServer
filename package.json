@@ -1,15 +1,16 @@
 {
-  "name": "moonserver",
-  "version": "1.0.1",
+  "name": "MoonServer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/MoonHoldings/MoonServer.git",
   "description": "MoonHoldings Server",
   "author": "Leon <leon@moonholdings.xyz> (https://twitter.com/leongaban)",
   "contributors": [
     "Leon Gaban",
-    "Abeer Abdul Ahad",
+    "Abdul Ahad Abeer",
     "Ajoy Thomas"
   ],
-  "license": "(MIT)",
-  "main": "index.js",
+  "license": "MIT",
   "scripts": {
     "build": "npm install",
     "dev": "nodemon index.js",
@@ -18,22 +19,20 @@
   "keywords": [],
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
-    "@superfaceai/passport-twitter-oauth2": "^1.2.2",
-    "axios": "^0.27.2",
-    "bcrypt": "^5.0.1",
+    "axios": "^1.2.5",
+    "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.1",
-    "express": "^4.18.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
     "express-session": "^1.17.3",
-    "firebase": "^9.8.3",
-    "googleapis": "^105.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "nodemailer": "^6.7.6",
-    "nodemon": "^2.0.19",
+    "firebase": "^9.16.0",
     "passport": "^0.6.0",
     "passport-discord": "^0.1.4",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^0.1.5"
+    "passport-twitter": "^1.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }

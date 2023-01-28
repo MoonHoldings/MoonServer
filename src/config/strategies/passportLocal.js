@@ -1,11 +1,18 @@
+const { compare } = require("bcrypt")
 const { query, where, getDocs } = require("firebase/firestore")
 const { Strategy } = require("passport-local")
-const { compare } = require("bcrypt")
-
 const ErrorHandler = require("../../utils/errorHandler")
 const { Users } = require("../firebase")
 
 module.exports = (passport) => {
+  // <1> Serialization and deserialization
+  passport.serializeUser(function (user, done) {
+    done(null, user)
+  })
+  passport.deserializeUser(function (obj, done) {
+    done(null, obj)
+  })
+
   passport.use(
     new Strategy(
       {
@@ -26,7 +33,6 @@ module.exports = (passport) => {
           )
           const qSnapshot = await getDocs(q)
           if (qSnapshot.docs.length === 0) {
-            console.log("no acc")
             return done(
               new ErrorHandler(
                 "There is no account associated to this email",
@@ -34,7 +40,7 @@ module.exports = (passport) => {
               )
             )
           }
-          console.log(qSnapshot.docs[0].data())
+
           const user = await qSnapshot.docs[0].data()
           const isValid = await compare(password, user.password)
 
@@ -51,12 +57,4 @@ module.exports = (passport) => {
       }
     )
   )
-
-  passport.serializeUser((user, done) => {
-    return done(null, user)
-  })
-
-  passport.deserializeUser((user, done) => {
-    return done(null, user)
-  })
 }

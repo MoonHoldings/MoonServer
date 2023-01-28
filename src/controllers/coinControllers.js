@@ -1,12 +1,12 @@
-const axios = require("axios")
+const { default: axios } = require("axios")
 const {
   doc,
+  getDoc,
   setDoc,
   query,
   where,
   getDocs,
   updateDoc,
-  getDoc,
 } = require("firebase/firestore")
 const { db, Users } = require("../config/firebase")
 const asyncErrorHandler = require("../middlewares/asyncErrorHandler")

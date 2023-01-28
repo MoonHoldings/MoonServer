@@ -6,17 +6,13 @@ const passport = require("passport")
 const cookieParser = require("cookie-parser")
 const session = require("express-session")
 
-const userRoutes = require("./src/routes/userRoutes")
-const coinRoutes = require("./src/routes/coinRoutes")
-const nftRoutes = require("./src/routes/nftRoutes")
-
 const errorMiddleware = require("./src/middlewares/error")
-const passportLocal = require("./src/config/strategies/passportLocal")
-const passportDiscord = require("./src/config/strategies/passportDiscord")
-const passportTwitter = require("./src/config/strategies/passportTwitter")
+
+require("./src/config/strategies/passportLocal")(passport)
+require("./src/config/strategies/passportTwitter")(passport)
+require("./src/config/strategies/passportDiscord")(passport)
 
 const app = express()
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(
@@ -25,27 +21,24 @@ app.use(
     credentials: true,
   })
 )
+app.use(cookieParser(process.env.COOKIE_SECRET))
 
+app.use(passport.initialize())
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     name: "MOON_SESSION",
-    resave: false,
+    resave: true,
     saveUninitialized: true,
   })
 )
 app.use(cookieParser(process.env.COOKIE_SECRET))
-app.use(passport.initialize())
-app.use(passport.session())
 
-passportLocal(passport)
-passportDiscord(passport)
-passportTwitter(passport)
-
-// all the routes
+// Routes
+const userRoutes = require("./src/routes/userRoutes")
+const coinRoutes = require("./src/routes/coinRoutes")
 app.use("/api", userRoutes)
 app.use("/api", coinRoutes)
-app.use("/api", nftRoutes)
 
 app.get("/hello", (req, res) => {
   res.setHeader("Content-Type", "text/html")
