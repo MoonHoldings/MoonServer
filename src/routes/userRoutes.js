@@ -61,8 +61,7 @@ router.get(
     failureRedirect: `${process.env.FE_REDIRECT}/login`,
   }),
   (req, res) => {
-    // res.redirect(`${process.env.FE_REDIRECT}/crypto-portfolio`)
-    res.redirect("https://www.google.com")
+    res.redirect(`${process.env.FE_REDIRECT}/nfts`)
   }
 )
 
@@ -73,7 +72,7 @@ router.get(
     failureRedirect: `${process.env.FE_REDIRECT}/login`,
   }),
   (req, res) => {
-    res.redirect(`${process.env.FE_REDIRECT}/crypto-portfolio`)
+    res.redirect(`${process.env.FE_REDIRECT}/nfts`)
   }
 )
 

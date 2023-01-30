@@ -146,9 +146,11 @@ exports.loginUser = asyncErrorHandler(async (req, res, next) => {
     else {
       req.logIn(user, (err) => {
         if (err) next(new ErrorHandler(err.message, 401))
+
+        const userObj = (({ password, ...u }) => u)(user)
         res.status(200).json({
           success: true,
-          user,
+          user: userObj,
         })
       })
     }
